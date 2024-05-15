@@ -1,9 +1,10 @@
 from fastapi import FastAPI
-from nodes import routers
+from nodes.routers import routers_nodes, routers_message
 
 app = FastAPI()
 
-app.include_router(routers.router)
+app.include_router(routers_message.router)
+app.include_router(routers_nodes.router)
 
 
 @app.get("/")
