@@ -1,45 +1,10 @@
 from pydantic import BaseModel
-from sqlalchemy import Enum
 
 from nodes.models import MessageStatuses
 
 
-#
-# class MessageStatuses(str, Enum):
-#     PENDING = "PENDING"
-#     SENT = "SENT"
-#     OPENED = "OPENED"
-#
-
-#
-# class NodeBase(BaseModel):
-#     type: str
-#
-#
-# class NodeCreate(NodeBase):
-#     pass
-#
-#
-# class Node(NodeBase):
-#     id: int
-#
-#
-# class AssociationBase(BaseModel):
-#     source_node_id: int
-#     target_node_id: int
-#
-#
-# class AssociationCreate(NodeBase):
-#     pass
-#
-#
-# class Association(NodeBase):
-#     id: int
-#
-
-
 class StartNodeBase(BaseModel):
-    output_edge_id: int
+    pass
 
 
 class StartNodeCreate(StartNodeBase):
@@ -48,6 +13,7 @@ class StartNodeCreate(StartNodeBase):
 
 class StartNode(StartNodeBase):
     id: int
+    message_node_id: int
 
 
 class MessageNodeBase(BaseModel):
@@ -65,12 +31,11 @@ class MessageNodeCreate(MessageNodeBase):
 
 class MessageNode(MessageNodeBase):
     id: int
+    end_node_id: int
 
 
 class ConditionNodeBase(BaseModel):
     condition: str
-    yes_edge_id: int
-    no_edge_id: int
 
 
 class ConditionNodeCreate(ConditionNodeBase):
@@ -79,10 +44,11 @@ class ConditionNodeCreate(ConditionNodeBase):
 
 class ConditionNode(ConditionNodeBase):
     id: int
+    message_node_id: int
 
 
 class EndNodeBase(BaseModel):
-    input_node_id: int
+    pass
 
 
 class EndNodeCreate(EndNodeBase):
@@ -91,3 +57,20 @@ class EndNodeCreate(EndNodeBase):
 
 class EndNode(EndNodeBase):
     id: int
+    message_node_id: int
+
+
+class WorkflowNodeBase(BaseModel):
+    pass
+
+
+class WorkflowNodeCreate(WorkflowNodeBase):
+    pass
+
+
+class WorkflowNode(WorkflowNodeBase):
+    id: int
+    start_node_id: int
+    message_node_id: int
+    condition_node_id: int
+    end_node_id: int

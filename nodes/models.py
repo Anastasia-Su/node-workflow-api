@@ -1,6 +1,6 @@
 from enum import auto, StrEnum
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Table
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 
 from database import Base
@@ -33,6 +33,11 @@ class StartNode(Base):
         foreign_keys=[message_node_id],
     )
 
+    workflow_node = relationship(
+        "WorkflowNode",
+        back_populates="start_node",
+    )
+
 
 class MessageNode(Base):
     __tablename__ = "message"
@@ -56,6 +61,10 @@ class MessageNode(Base):
         "EndNode",
         foreign_keys=[end_node_id],
     )
+    workflow_node = relationship(
+        "WorkflowNode",
+        back_populates="message_node",
+    )
 
 
 class ConditionNode(Base):
@@ -73,6 +82,12 @@ class ConditionNode(Base):
         foreign_keys=[message_node_id],
     )
 
+    workflow_node = relationship(
+        "WorkflowNode",
+        back_populates="condition_node",
+        # foreign_keys=[workflow_node_id],
+    )
+
 
 class EndNode(Base):
     __tablename__ = "end"
@@ -80,8 +95,33 @@ class EndNode(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
 
     message_node_id = Column(Integer, ForeignKey("message.id"), nullable=True)
+
+    workflow_node = relationship(
+        "WorkflowNode",
+        back_populates="end_node",
+    )
     # message_node = relationship(
     #     "MessageNode",
     #     back_populates="end_node",
     #     foreign_keys=[message_node_id],
     # )
+
+
+class WorkflowNode(Base):
+    __tablename__ = "workflow_nodes"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    start_node_id = Column(Integer, ForeignKey("start.id"))
+    start_node = relationship("StartNode", back_populates="workflow_node")
+
+    message_node_id = Column(Integer, ForeignKey("message.id"))
+    message_node = relationship("MessageNode", back_populates="workflow_node")
+
+    condition_node_id = Column(Integer, ForeignKey("condition.id"))
+    condition_node = relationship(
+        "ConditionNode", back_populates="workflow_node"
+    )
+
+    end_node_id = Column(Integer, ForeignKey("end.id"))
+    end_node = relationship("EndNode", back_populates="workflow_node")
