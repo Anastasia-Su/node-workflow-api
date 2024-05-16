@@ -4,15 +4,14 @@ from nodes.utils import execute_workflow
 from fastapi import HTTPException, APIRouter
 
 from dependencies import CommonDB
-from nodes import models, schemas
-from nodes.crud import crud_workflow
-
+from nodes import models, schemas, crud
+from nodes.crud import crud_workflow, crud_message, crud_condition
 
 router = APIRouter()
 
 
 @router.get("/workflows/", response_model=list[schemas.WorkflowNode])
-def read_workflow_nodes(
+def read_workflows(
     db: CommonDB,
 ) -> list[models.WorkflowNode]:
 
@@ -42,15 +41,11 @@ def create_workflow_endpoint(
     db: CommonDB,
 ) -> models.WorkflowNode:
 
-    # existing_node = crud.get_message_node_by_status_and_text(db=db, status=message_node.status, text=message_node.text)
-    # if existing_node:
-    #     raise HTTPException(status_code=400, detail="A node with the same status and text already exists")
-
     return crud_workflow.create_workflow(db=db, node=workflow)
 
 
 @router.put(
-    "/workflow_nodes/{workflow_node_id}",
+    "/workflows/{workflow_id}",
     response_model=schemas.WorkflowNodeCreate,
 )
 def update_workflow_node_endpoint(
@@ -60,9 +55,9 @@ def update_workflow_node_endpoint(
         db=db,
         node_id=node_id,
         new_start_node=node.start_node,
-        # new_message_node=node.message_node,
-        # new_condition_node=node.condition_node,
-        # new_end_node=node.end_node,
+        new_message_nodes=node.message_nodes,
+        new_condition_nodes=node.condition_nodes,
+        new_end_node=node.end_node,
     )
     if db_node is None:
         raise HTTPException(status_code=404, detail="Node not found")
@@ -71,7 +66,7 @@ def update_workflow_node_endpoint(
 
 
 @router.delete(
-    "/workflow_nodes/{workflow_node_id}",
+    "/workflows/{workflow_id}",
     response_model=schemas.WorkflowNode,
 )
 def delete_workflow_node(node_id: int, db: CommonDB):
@@ -83,23 +78,26 @@ def delete_workflow_node(node_id: int, db: CommonDB):
 
 
 #
-# @router.post("/workflow/construct/")
+#
+# @router.post("/workflows/{workflow_id}/construct")
 # def construct_workflow(
-#     message_ids: list[int], condition_ids: list[int], db: CommonDB
+#     db: CommonDB
 # ):
-#     # Fetch messages and conditions based on the provided IDs
-#     messages = get_messages_from_database(db, message_ids)
-#     conditions = get_conditions_from_database(db, condition_ids)
+#
+#     messages = crud_message.get_message_node_list(db=db)
+#     conditions = crud_condition.get_condition_node_list(db=db)
 #
 #     # Create a start node
-#     start_node = WorkFlowNodeCreate(
-#         status=MessageStatus.PENDING, text="Start of workflow"
+#     start_node = crud_workflow.get_workflow_detail(
+#         db=db, node_id=workflow_id
 #     )
 #     db_node = create_workflow_node(db, start_node)
 #
 #     # Create message nodes
-#     for message_id in message_ids:
-#         message = get_message_from_database(db, message_id)
+#     for message in messages:
+#         message = crud_message.get_message_node_detail(
+#         db=db, node_id=message.id
+#     )
 #         message_node = WorkFlowNodeCreate(
 #             status=message.status, text=message.text
 #         )
@@ -114,12 +112,12 @@ def delete_workflow_node(node_id: int, db: CommonDB):
 #         )
 #         db_node = create_workflow_node(db, condition_node)
 #         db_node.start_node_id = start_node.id
-
+#
 # Link nodes together based on your workflow logic
 # You would need to implement this logic based on your requirements
-
+#
 # return {"message": "Workflow constructed successfully"}
-
+#
 #
 # @router.post("/workflow/run/")
 # def run_workflow(start_node_id: int, db: Session = Depends(get_db)):
@@ -132,10 +130,13 @@ def delete_workflow_node(node_id: int, db: CommonDB):
 #     return {"message": "Workflow executed successfully"}
 #
 
-
-# @router.post("/workflow/execute")
-# def execute_workflow(db: CommonDB):
-#     start_node = crud_nodes.get_start_node(db=db)
+#
+# @router.post("/workflows/{workflow_id}/execute")
+# def execute_workflow(db: CommonDB, workflow_id: int):
+#     db_workflow_node = crud_workflow.get_workflow_detail(
+#         db=db, node_id=workflow_id
+#     )
+#     start_node = db_workflow_node.start_node
 #     if not start_node:
 #         raise HTTPException(status_code=404, detail="Start node not found")
 #

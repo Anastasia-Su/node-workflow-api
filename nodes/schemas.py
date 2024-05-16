@@ -65,12 +65,11 @@ class WorkflowNodeBase(BaseModel):
 
 
 class WorkflowNodeCreate(WorkflowNodeBase):
-    pass
-
-
-class WorkflowNode(WorkflowNodeBase):
-    id: int
     start_node_id: int
-    # message_node_id: int
-    # condition_node_id: int
-    # end_node_id: int
+    message_node_ids: list[int]
+    condition_node_ids: list[int]
+    end_node_id: int
+
+
+class WorkflowNode(WorkflowNodeCreate):
+    id: int

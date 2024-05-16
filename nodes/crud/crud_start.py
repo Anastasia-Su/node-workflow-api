@@ -13,6 +13,7 @@ def get_start_node_detail(db: Session, node_id: int) -> models.StartNode:
 def create_start_node(
     db: Session, node: schemas.StartNodeCreate
 ) -> models.StartNode:
+
     db_node = models.StartNode(
         message=node.message, message_node_id=node.message_node_id
     )

@@ -1,9 +1,24 @@
 from enum import auto, StrEnum
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Table
 from sqlalchemy.orm import relationship
 
 from database import Base
+
+
+workflow_message_association = Table(
+    "workflow_message_association",
+    Base.metadata,
+    Column("workflow_node_id", Integer, ForeignKey("workflow_nodes.id")),
+    Column("message_node_id", Integer, ForeignKey("message.id")),
+)
+
+workflow_condition_association = Table(
+    "workflow_condition_association",
+    Base.metadata,
+    Column("workflow_node_id", Integer, ForeignKey("workflow_nodes.id")),
+    Column("condition_node_id", Integer, ForeignKey("condition.id")),
+)
 
 
 class MessageStatuses(StrEnum):
@@ -25,9 +40,7 @@ class StartNode(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     message = Column(String(255), nullable=True)
 
-    message_node_id = Column(
-        Integer, ForeignKey("message.id"), nullable=True, unique=True
-    )
+    message_node_id = Column(Integer, ForeignKey("message.id"), nullable=True)
     message_node = relationship(
         "MessageNode",
         back_populates="start_node",
@@ -64,8 +77,13 @@ class MessageNode(Base):
     # )
     # workflow_node = relationship(
     #     "WorkflowNode",
-    #     back_populates="message_node",
+    #     back_populates="message_nodes",
     # )
+    workflow_node = relationship(
+        "WorkflowNode",
+        secondary=workflow_message_association,
+        backref="workflow_message_nodes",
+    )
 
 
 class ConditionNode(Base):
@@ -74,9 +92,7 @@ class ConditionNode(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     condition = Column(String, nullable=False)
 
-    message_node_id = Column(
-        Integer, ForeignKey("message.id"), nullable=True, unique=True
-    )
+    message_node_id = Column(Integer, ForeignKey("message.id"), nullable=True)
     message_node = relationship(
         "MessageNode",
         back_populates="condition_node",
@@ -85,9 +101,14 @@ class ConditionNode(Base):
 
     # workflow_node = relationship(
     #     "WorkflowNode",
-    #     back_populates="condition_node",
+    #     back_populates="condition_nodes",
     #     # foreign_keys=[workflow_node_id],
     # )
+    workflow_node = relationship(
+        "WorkflowNode",
+        secondary=workflow_condition_association,
+        backref="workflow_condition_nodes",
+    )
 
 
 class EndNode(Base):
@@ -97,19 +118,17 @@ class EndNode(Base):
 
     message = Column(String(255), nullable=True)
 
-    message_node_id = Column(
-        Integer, ForeignKey("message.id"), nullable=True, unique=True
-    )
+    message_node_id = Column(Integer, ForeignKey("message.id"), nullable=True)
     message_node = relationship(
         "MessageNode",
         # back_populates="end_node",
         foreign_keys=[message_node_id],
     )
 
-    # workflow_node = relationship(
-    #     "WorkflowNode",
-    #     back_populates="end_node",
-    # )
+    workflow_node = relationship(
+        "WorkflowNode",
+        back_populates="end_node",
+    )
 
     # message_node_id = Column(Integer, ForeignKey("message.id"), nullable=True)
 
@@ -126,15 +145,31 @@ class WorkflowNode(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     start_node_id = Column(Integer, ForeignKey("start.id"))
-    start_node = relationship("StartNode", back_populates="workflow_node")
+    start_node = relationship(
+        "StartNode",
+        back_populates="workflow_node",
+        foreign_keys=[start_node_id],
+    )
 
-    # message_node_id = Column(Integer, ForeignKey("message.id"))
-    # message_node = relationship("MessageNode", back_populates="workflow_node")
-    #
-    # condition_node_id = Column(Integer, ForeignKey("condition.id"))
-    # condition_node = relationship(
-    #     "ConditionNode", back_populates="workflow_node"
-    # )
-    #
-    # end_node_id = Column(Integer, ForeignKey("end.id"))
-    # end_node = relationship("EndNode", back_populates="workflow_node")
+    message_node_ids = Column(String)
+    message_nodes = relationship(
+        "MessageNode",
+        primaryjoin="WorkflowNode.id == workflow_message_association.c.workflow_node_id",
+        secondary=workflow_message_association,
+        secondaryjoin="MessageNode.id == workflow_message_association.c.message_node_id",
+        backref="workflow_nodes",
+        # foreign_keys=[message_node_ids],
+    )
+
+    condition_node_ids = Column(String)
+    condition_nodes = relationship(
+        "ConditionNode",
+        primaryjoin="WorkflowNode.id == workflow_condition_association.c.workflow_node_id",
+        secondary=workflow_condition_association,
+        secondaryjoin="ConditionNode.id == workflow_condition_association.c.condition_node_id",
+        backref="workflow_nodes",
+        # foreign_keys=[condition_node_ids],
+    )
+
+    end_node_id = Column(Integer, ForeignKey("end.id"))
+    end_node = relationship("EndNode", back_populates="workflow_node")
