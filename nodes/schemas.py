@@ -4,16 +4,16 @@ from nodes.models import MessageStatuses
 
 
 class StartNodeBase(BaseModel):
-    pass
+    message: str | None = None
 
 
 class StartNodeCreate(StartNodeBase):
-    pass
+    message_node_id: int | None = None
 
 
 class StartNode(StartNodeBase):
     id: int
-    message_node_id: int
+    message_node_id: int | None = None
 
 
 class MessageNodeBase(BaseModel):
@@ -31,7 +31,7 @@ class MessageNodeCreate(MessageNodeBase):
 
 class MessageNode(MessageNodeBase):
     id: int
-    end_node_id: int
+    # end_node_id: int
 
 
 class ConditionNodeBase(BaseModel):
@@ -44,20 +44,20 @@ class ConditionNodeCreate(ConditionNodeBase):
 
 class ConditionNode(ConditionNodeBase):
     id: int
-    message_node_id: int
+    message_node_id: int | None = None
 
 
 class EndNodeBase(BaseModel):
-    pass
+    message: str | None = None
 
 
 class EndNodeCreate(EndNodeBase):
-    pass
+    message_node_id: int | None = None
 
 
 class EndNode(EndNodeBase):
     id: int
-    message_node_id: int
+    message_node_id: int | None = None
 
 
 class WorkflowNodeBase(BaseModel):
@@ -71,6 +71,6 @@ class WorkflowNodeCreate(WorkflowNodeBase):
 class WorkflowNode(WorkflowNodeBase):
     id: int
     start_node_id: int
-    message_node_id: int
-    condition_node_id: int
-    end_node_id: int
+    # message_node_id: int
+    # condition_node_id: int
+    # end_node_id: int

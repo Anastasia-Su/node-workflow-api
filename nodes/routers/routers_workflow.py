@@ -11,7 +11,7 @@ from nodes.crud import crud_workflow
 router = APIRouter()
 
 
-@router.get("/workflow_nodes/", response_model=list[schemas.WorkflowNode])
+@router.get("/workflows/", response_model=list[schemas.WorkflowNode])
 def read_workflow_nodes(
     db: CommonDB,
 ) -> list[models.WorkflowNode]:
@@ -60,9 +60,9 @@ def update_workflow_node_endpoint(
         db=db,
         node_id=node_id,
         new_start_node=node.start_node,
-        new_message_node=node.message_node,
-        new_condition_node=node.condition_node,
-        new_end_node=node.end_node,
+        # new_message_node=node.message_node,
+        # new_condition_node=node.condition_node,
+        # new_end_node=node.end_node,
     )
     if db_node is None:
         raise HTTPException(status_code=404, detail="Node not found")

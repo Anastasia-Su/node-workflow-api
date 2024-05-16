@@ -15,9 +15,9 @@ def create_workflow(
 ) -> models.WorkflowNode:
     db_node = models.WorkflowNode(
         start_node_id=node.start_node,
-        message_node_id=node.message_node,
-        condition_node_id=node.condition_node,
-        end_node_id=node.end_node,
+        # message_node_id=node.message_node,
+        # condition_node_id=node.condition_node,
+        # end_node_id=node.end_node,
     )
     db.add(db_node)
     db.commit()
@@ -30,16 +30,16 @@ def update_workflow(
     db: Session,
     node_id: int,
     new_start_node: int,
-    new_message_node: int,
-    new_condition_node: int,
-    new_end_node: int,
+    # new_message_node: int,
+    # new_condition_node: int,
+    # new_end_node: int,
 ):
     node = db.get(models.WorkflowNode, node_id)
     if node:
         node.start_node_id = (new_start_node,)
-        node.message_node_id = (new_message_node,)
-        node.condition_node_id = (new_condition_node,)
-        node.end_node_id = (new_end_node,)
+        # node.message_node_id = (new_message_node,)
+        # node.condition_node_id = (new_condition_node,)
+        # node.end_node_id = (new_end_node,)
         db.commit()
         db.refresh(node)
 

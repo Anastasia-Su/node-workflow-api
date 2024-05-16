@@ -23,6 +23,7 @@ class StartNode(Base):
     __tablename__ = "start"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    message = Column(String(255), nullable=True)
 
     message_node_id = Column(
         Integer, ForeignKey("message.id"), nullable=True, unique=True
@@ -56,15 +57,15 @@ class MessageNode(Base):
         back_populates="message_node",
     )
 
-    end_node_id = Column(Integer, ForeignKey("end.id"), nullable=True)
-    end_node = relationship(
-        "EndNode",
-        foreign_keys=[end_node_id],
-    )
-    workflow_node = relationship(
-        "WorkflowNode",
-        back_populates="message_node",
-    )
+    # end_node_id = Column(Integer, ForeignKey("end.id"), nullable=True)
+    # end_node = relationship(
+    #     "EndNode",
+    #     foreign_keys=[end_node_id],
+    # )
+    # workflow_node = relationship(
+    #     "WorkflowNode",
+    #     back_populates="message_node",
+    # )
 
 
 class ConditionNode(Base):
@@ -79,14 +80,14 @@ class ConditionNode(Base):
     message_node = relationship(
         "MessageNode",
         back_populates="condition_node",
-        foreign_keys=[message_node_id],
+        # foreign_keys=[message_node_id],
     )
 
-    workflow_node = relationship(
-        "WorkflowNode",
-        back_populates="condition_node",
-        # foreign_keys=[workflow_node_id],
-    )
+    # workflow_node = relationship(
+    #     "WorkflowNode",
+    #     back_populates="condition_node",
+    #     # foreign_keys=[workflow_node_id],
+    # )
 
 
 class EndNode(Base):
@@ -94,12 +95,24 @@ class EndNode(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
 
-    message_node_id = Column(Integer, ForeignKey("message.id"), nullable=True)
+    message = Column(String(255), nullable=True)
 
-    workflow_node = relationship(
-        "WorkflowNode",
-        back_populates="end_node",
+    message_node_id = Column(
+        Integer, ForeignKey("message.id"), nullable=True, unique=True
     )
+    message_node = relationship(
+        "MessageNode",
+        # back_populates="end_node",
+        foreign_keys=[message_node_id],
+    )
+
+    # workflow_node = relationship(
+    #     "WorkflowNode",
+    #     back_populates="end_node",
+    # )
+
+    # message_node_id = Column(Integer, ForeignKey("message.id"), nullable=True)
+
     # message_node = relationship(
     #     "MessageNode",
     #     back_populates="end_node",
@@ -115,13 +128,13 @@ class WorkflowNode(Base):
     start_node_id = Column(Integer, ForeignKey("start.id"))
     start_node = relationship("StartNode", back_populates="workflow_node")
 
-    message_node_id = Column(Integer, ForeignKey("message.id"))
-    message_node = relationship("MessageNode", back_populates="workflow_node")
-
-    condition_node_id = Column(Integer, ForeignKey("condition.id"))
-    condition_node = relationship(
-        "ConditionNode", back_populates="workflow_node"
-    )
-
-    end_node_id = Column(Integer, ForeignKey("end.id"))
-    end_node = relationship("EndNode", back_populates="workflow_node")
+    # message_node_id = Column(Integer, ForeignKey("message.id"))
+    # message_node = relationship("MessageNode", back_populates="workflow_node")
+    #
+    # condition_node_id = Column(Integer, ForeignKey("condition.id"))
+    # condition_node = relationship(
+    #     "ConditionNode", back_populates="workflow_node"
+    # )
+    #
+    # end_node_id = Column(Integer, ForeignKey("end.id"))
+    # end_node = relationship("EndNode", back_populates="workflow_node")

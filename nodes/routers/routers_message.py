@@ -7,22 +7,6 @@ from nodes.crud import crud_message
 router = APIRouter()
 
 
-# def get_db() -> Session:
-#     db = SessionLocal()
-#
-#     try:
-#         yield db
-#     finally:
-#         db.close()
-
-
-@router.get("/")
-def root() -> dict:
-    print("Received request at root endpoint")
-
-    return {"message": "Hello World"}
-
-
 @router.get("/message_nodes/", response_model=list[schemas.MessageNode])
 def read_message_nodes(
     db: CommonDB,
