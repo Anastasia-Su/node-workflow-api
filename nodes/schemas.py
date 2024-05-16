@@ -11,35 +11,43 @@ from nodes.models import MessageStatuses
 #     OPENED = "OPENED"
 #
 
-
-class NodeBase(BaseModel):
-    type: str
-
-
-class NodeCreate(NodeBase):
-    pass
-
-
-class Node(NodeBase):
-    id: int
-
-
-class AssociationBase(BaseModel):
-    source_node_id: int
-    target_node_id: int
-
-
-class AssociationCreate(NodeBase):
-    pass
-
-
-class Association(NodeBase):
-    id: int
+#
+# class NodeBase(BaseModel):
+#     type: str
+#
+#
+# class NodeCreate(NodeBase):
+#     pass
+#
+#
+# class Node(NodeBase):
+#     id: int
+#
+#
+# class AssociationBase(BaseModel):
+#     source_node_id: int
+#     target_node_id: int
+#
+#
+# class AssociationCreate(NodeBase):
+#     pass
+#
+#
+# class Association(NodeBase):
+#     id: int
+#
 
 
 class StartNodeBase(BaseModel):
-    id: int
     output_edge_id: int
+
+
+class StartNodeCreate(StartNodeBase):
+    pass
+
+
+class StartNode(StartNodeBase):
+    id: int
 
 
 class MessageNodeBase(BaseModel):
@@ -60,15 +68,26 @@ class MessageNode(MessageNodeBase):
 
 
 class ConditionNodeBase(BaseModel):
-    id: int
+    condition: str
     yes_edge_id: int
     no_edge_id: int
-    previous_message_id: int
+
+
+class ConditionNodeCreate(ConditionNodeBase):
+    pass
+
+
+class ConditionNode(ConditionNodeBase):
+    id: int
 
 
 class EndNodeBase(BaseModel):
-    id: int
     input_node_id: int
 
-    class Config:
-        from_attributes = True
+
+class EndNodeCreate(EndNodeBase):
+    pass
+
+
+class EndNode(EndNodeBase):
+    id: int
