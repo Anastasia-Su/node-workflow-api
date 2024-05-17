@@ -10,46 +10,44 @@ from nodes.crud import crud_workflow, crud_message, crud_condition
 router = APIRouter()
 
 
-@router.get("/workflows/", response_model=list[schemas.WorkflowNode])
+@router.get("/workflows/", response_model=list[schemas.Workflow])
 def read_workflows(
     db: CommonDB,
-) -> list[models.WorkflowNode]:
+) -> list[models.Workflow]:
 
     return crud_workflow.get_workflow_list(db=db)
 
 
 @router.get(
     "/workflows/{workflow_id}/",
-    response_model=schemas.WorkflowNode,
+    response_model=schemas.Workflow,
 )
-def read_single_workflow(
-    workflow_id: int, db: CommonDB
-) -> models.WorkflowNode:
+def read_single_workflow(workflow_id: int, db: CommonDB) -> models.Workflow:
     db_workflow_node = crud_workflow.get_workflow_detail(
         db=db, node_id=workflow_id
     )
 
     if db_workflow_node is None:
-        raise HTTPException(status_code=404, detail="Node not found")
+        raise HTTPException(status_code=404, detail="Workflow not found")
 
     return db_workflow_node
 
 
-@router.post("/workflows/", response_model=schemas.WorkflowNodeCreate)
+@router.post("/workflows/", response_model=schemas.WorkflowCreate)
 def create_workflow_endpoint(
-    workflow: schemas.WorkflowNodeCreate,
+    workflow: schemas.WorkflowCreate,
     db: CommonDB,
-) -> models.WorkflowNode:
+) -> models.Workflow:
 
     return crud_workflow.create_workflow(db=db, node=workflow)
 
 
 @router.put(
     "/workflows/{workflow_id}",
-    response_model=schemas.WorkflowNodeCreate,
+    response_model=schemas.WorkflowCreate,
 )
-def update_workflow_node_endpoint(
-    node_id: int, node: schemas.WorkflowNodeCreate, db: CommonDB
+def update_workflow_endpoint(
+    node_id: int, node: schemas.WorkflowCreate, db: CommonDB
 ):
     db_node = crud_workflow.update_workflow(
         db=db,
@@ -60,19 +58,19 @@ def update_workflow_node_endpoint(
         new_end_node=node.end_node,
     )
     if db_node is None:
-        raise HTTPException(status_code=404, detail="Node not found")
+        raise HTTPException(status_code=404, detail="Workflow not found")
 
     return db_node
 
 
 @router.delete(
     "/workflows/{workflow_id}",
-    response_model=schemas.WorkflowNode,
+    response_model=schemas.Workflow,
 )
-def delete_workflow_node(node_id: int, db: CommonDB):
+def delete_workflow(node_id: int, db: CommonDB):
     db_node = crud_workflow.delete_workflow(db=db, node_id=node_id)
     if db_node is None:
-        raise HTTPException(status_code=404, detail="Node not found")
+        raise HTTPException(status_code=404, detail="Workflow not found")
 
     return db_node
 

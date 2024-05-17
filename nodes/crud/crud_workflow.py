@@ -2,22 +2,22 @@ from sqlalchemy.orm import Session
 from nodes import models, schemas
 
 
-def get_workflow_list(db: Session) -> list[models.WorkflowNode]:
-    return db.query(models.WorkflowNode).all()
+def get_workflow_list(db: Session) -> list[models.Workflow]:
+    return db.query(models.Workflow).all()
 
 
-def get_workflow_detail(db: Session, node_id: int) -> models.WorkflowNode:
-    return db.query(models.WorkflowNode).get(node_id)
+def get_workflow_detail(db: Session, node_id: int) -> models.Workflow:
+    return db.query(models.Workflow).get(node_id)
 
 
 def create_workflow(
-    db: Session, node: schemas.WorkflowNodeCreate
-) -> models.WorkflowNode:
+    db: Session, node: schemas.WorkflowCreate
+) -> models.Workflow:
 
     message_node_ids_str = ",".join(map(str, node.message_node_ids))
     condition_node_ids_str = ",".join(map(str, node.condition_node_ids))
 
-    db_node = models.WorkflowNode(
+    db_node = models.Workflow(
         start_node_id=node.start_node_id,
         message_node_ids=message_node_ids_str,
         condition_node_ids=condition_node_ids_str,
@@ -50,7 +50,7 @@ def update_workflow(
     new_end_node: int,
 ):
 
-    node = db.get(models.WorkflowNode, node_id)
+    node = db.get(models.Workflow, node_id)
 
     if node:
         node.start_node_id = (new_start_node,)
@@ -64,7 +64,7 @@ def update_workflow(
 
 
 def delete_workflow(db: Session, node_id: int):
-    node = db.get(models.WorkflowNode, node_id)
+    node = db.get(models.Workflow, node_id)
     if node:
         db.delete(node)
         db.commit()

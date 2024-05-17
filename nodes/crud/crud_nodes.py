@@ -2,9 +2,9 @@ from sqlalchemy.orm import Session
 from nodes import models
 
 
-def get_start_node(db: Session):
-    return db.query(models.StartNode).first()
-
+# def get_start_node(db: Session):
+#     return db.query(models.StartNode).first()
+#
 
 # from sqlalchemy.orm import Session
 # from nodes import models, schemas

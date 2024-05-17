@@ -17,6 +17,9 @@ def create_condition_node(
 ) -> models.ConditionNode:
     db_node = models.ConditionNode(
         condition=node.condition,
+        edge=node.edge,
+        parent_node_id=node.parent_node_id,
+        parent_message_node_id=node.parent_message_node_id,
     )
     db.add(db_node)
     db.commit()
@@ -25,12 +28,19 @@ def create_condition_node(
     return db_node
 
 
-def update_condition_node(db: Session, node_id: int, new_condition: str):
+def update_condition_node(
+    db: Session, node_id: int, new_node: schemas.ConditionNodeCreate
+):
     node = db.get(models.ConditionNode, node_id)
     if node:
-        node.condition = new_condition
+        node.condition = new_node.condition
+        node.edge = new_node.edge
+        node.parent_node_id = new_node.parent_node_id
+        node.parent_message_node_id = new_node.parent_message_node_id
+
         db.commit()
         db.refresh(node)
+
     return node
 
 
@@ -39,4 +49,5 @@ def delete_condition_node(db: Session, node_id: int):
     if node:
         db.delete(node)
         db.commit()
+
     return node

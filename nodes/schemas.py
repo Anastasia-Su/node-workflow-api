@@ -1,3 +1,5 @@
+from enum import StrEnum
+
 from pydantic import BaseModel
 
 from nodes.models import MessageStatuses
@@ -8,12 +10,11 @@ class StartNodeBase(BaseModel):
 
 
 class StartNodeCreate(StartNodeBase):
-    message_node_id: int | None = None
+    pass
 
 
 class StartNode(StartNodeBase):
     id: int
-    message_node_id: int | None = None
 
 
 class MessageNodeBase(BaseModel):
@@ -26,25 +27,25 @@ class MessageNodeBase(BaseModel):
 
 
 class MessageNodeCreate(MessageNodeBase):
-    pass
+    parent_node_id: int | None = None
 
 
-class MessageNode(MessageNodeBase):
+class MessageNode(MessageNodeCreate):
     id: int
-    # end_node_id: int
 
 
 class ConditionNodeBase(BaseModel):
     condition: str
+    edge: StrEnum
 
 
 class ConditionNodeCreate(ConditionNodeBase):
-    pass
+    parent_node_id: int | None = None
+    parent_message_node_id: int | None = None
 
 
-class ConditionNode(ConditionNodeBase):
+class ConditionNode(ConditionNodeCreate):
     id: int
-    message_node_id: int | None = None
 
 
 class EndNodeBase(BaseModel):
@@ -52,24 +53,23 @@ class EndNodeBase(BaseModel):
 
 
 class EndNodeCreate(EndNodeBase):
-    message_node_id: int | None = None
+    parent_message_node_id: int | None = None
 
 
-class EndNode(EndNodeBase):
+class EndNode(EndNodeCreate):
     id: int
-    message_node_id: int | None = None
 
 
-class WorkflowNodeBase(BaseModel):
+class WorkflowBase(BaseModel):
     pass
 
 
-class WorkflowNodeCreate(WorkflowNodeBase):
+class WorkflowCreate(WorkflowBase):
     start_node_id: int
     message_node_ids: list[int]
     condition_node_ids: list[int]
     end_node_id: int
 
 
-class WorkflowNode(WorkflowNodeCreate):
+class Workflow(WorkflowCreate):
     id: int

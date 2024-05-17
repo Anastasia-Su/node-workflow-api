@@ -16,6 +16,7 @@ def create_message_node(
     db_node = models.MessageNode(
         status=node.status,
         text=node.text,
+        parent_node_id=node.parent_node_id,
     )
     db.add(db_node)
     db.commit()
@@ -25,14 +26,17 @@ def create_message_node(
 
 
 def update_message_node(
-    db: Session, node_id: int, new_status: str, new_text: str
+    db: Session, node_id: int, new_node: schemas.MessageNodeCreate
 ):
     node = db.get(models.MessageNode, node_id)
     if node:
-        node.status = new_status
-        node.text = new_text
+        node.status = new_node.status
+        node.text = new_node.text
+        node.parent_node_id = new_node.parent_node_id
+
         db.commit()
         db.refresh(node)
+
     return node
 
 

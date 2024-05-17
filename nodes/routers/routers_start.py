@@ -35,13 +35,6 @@ def create_start_node_endpoint(
     db: CommonDB,
 ) -> models.StartNode:
 
-    if (
-        not db.query(models.MessageNode)
-        .filter(models.MessageNode.id == start_node.message_node_id)
-        .first()
-    ):
-        raise HTTPException(status_code=404, detail="Message node not found")
-
     return crud_start.create_start_node(db=db, node=start_node)
 
 
@@ -52,19 +45,12 @@ def create_start_node_endpoint(
 def update_start_node_endpoint(
     node_id: int, node: schemas.StartNodeCreate, db: CommonDB
 ):
-    if (
-        not db.query(models.MessageNode)
-        .filter(models.MessageNode.id == node.message_node_id)
-        .first()
-    ):
-        raise HTTPException(status_code=404, detail="Message node not found")
-
     db_node = crud_start.update_start_node(
         db=db,
         node_id=node_id,
         new_message=node.message,
-        new_message_node_id=node.message_node_id,
     )
+
     if db_node is None:
         raise HTTPException(status_code=404, detail="Node not found")
 
@@ -76,6 +62,7 @@ def update_start_node_endpoint(
 )
 def delete_start_node(node_id: int, db: CommonDB):
     db_node = crud_start.delete_start_node(db=db, node_id=node_id)
+
     if db_node is None:
         raise HTTPException(status_code=404, detail="Node not found")
 

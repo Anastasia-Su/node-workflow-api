@@ -38,9 +38,23 @@ def create_condition_node_endpoint(
     db: CommonDB,
 ) -> models.ConditionNode:
 
-    # existing_node = crud.get_message_node_by_status_and_text(db=db, status=message_node.status, text=message_node.text)
-    # if existing_node:
-    #     raise HTTPException(status_code=400, detail="A node with the same status and text already exists")
+    parent_node = db.query(models.Node).get(condition_node.parent_node_id)
+
+    parent_message_node = db.query(models.Node).get(
+        condition_node.parent_message_node_id
+    )
+
+    if not parent_node:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Parent node with id {condition_node.parent_node_id} not found",
+        )
+
+    if not parent_message_node:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Parent message node with id {condition_node.parent_message_node_id} not found",
+        )
 
     return crud_condition.create_condition_node(db=db, node=condition_node)
 
@@ -52,9 +66,27 @@ def create_condition_node_endpoint(
 def update_condition_node_endpoint(
     node_id: int, node: schemas.ConditionNodeCreate, db: CommonDB
 ):
-    db_node = crud_condition.update_condition_node(
-        db=db, node_id=node_id, new_condition=node.condition
+    parent_node = db.query(models.Node).get(node.parent_node_id)
+    parent_message_node = db.query(models.Node).get(
+        node.parent_message_node_id
     )
+
+    if not parent_node:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Parent node with id {node.parent_node_id} not found",
+        )
+
+    if not parent_message_node:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Parent message node with id {node.parent_message_node_id} not found",
+        )
+
+    db_node = crud_condition.update_condition_node(
+        db=db, node_id=node_id, new_node=node
+    )
+
     if db_node is None:
         raise HTTPException(status_code=404, detail="Node not found")
 

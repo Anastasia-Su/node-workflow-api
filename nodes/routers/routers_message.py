@@ -37,9 +37,13 @@ def create_message_node_endpoint(
     db: CommonDB,
 ) -> models.MessageNode:
 
-    # existing_node = crud.get_message_node_by_status_and_text(db=db, status=message_node.status, text=message_node.text)
-    # if existing_node:
-    #     raise HTTPException(status_code=400, detail="A node with the same status and text already exists")
+    parent_node = db.query(models.Node).get(message_node.parent_node_id)
+
+    if not parent_node:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Parent node with id {message_node.parent_node_id} not found",
+        )
 
     return crud_message.create_message_node(db=db, node=message_node)
 
@@ -51,11 +55,22 @@ def create_message_node_endpoint(
 def update_message_node_endpoint(
     node_id: int, node: schemas.MessageNodeCreate, db: CommonDB
 ):
+    parent_node = db.query(models.Node).get(node.parent_node_id)
+
+    if not parent_node:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Parent node with id {node.parent_node_id} not found",
+        )
+
     db_node = crud_message.update_message_node(
-        db=db, node_id=node_id, new_status=node.status, new_text=node.text
+        db=db, node_id=node_id, new_node=node
     )
+
     if db_node is None:
-        raise HTTPException(status_code=404, detail="Node not found")
+        raise HTTPException(
+            status_code=404, detail=f"Node with id {node_id} not found"
+        )
 
     return db_node
 

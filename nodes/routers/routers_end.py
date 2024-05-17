@@ -30,13 +30,15 @@ def create_end_node_endpoint(
     end_node: schemas.EndNodeCreate,
     db: CommonDB,
 ) -> models.EndNode:
+    parent_message_node = db.query(models.Node).get(
+        end_node.parent_message_node_id
+    )
 
-    if (
-        not db.query(models.MessageNode)
-        .filter(models.MessageNode.id == end_node.message_node_id)
-        .first()
-    ):
-        raise HTTPException(status_code=404, detail="Message node not found")
+    if not parent_message_node:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Parent message node with id {end_node.parent_message_node_id} not found",
+        )
 
     return crud_end.create_end_node(db=db, node=end_node)
 
@@ -48,19 +50,21 @@ def create_end_node_endpoint(
 def update_end_node_endpoint(
     node_id: int, node: schemas.EndNodeCreate, db: CommonDB
 ):
+    parent_message_node = db.query(models.Node).get(
+        node.parent_message_node_id
+    )
+
+    if not parent_message_node:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Parent message node with id {node.parent_message_node_id} not found",
+        )
+
     db_node = crud_end.update_end_node(
         db=db,
         node_id=node_id,
-        new_message=node.message,
-        new_message_node_id=node.message_node_id,
+        new_node=node,
     )
-
-    if (
-        not db.query(models.MessageNode)
-        .filter(models.MessageNode.id == node.message_node_id)
-        .first()
-    ):
-        raise HTTPException(status_code=404, detail="Message node not found")
 
     if db_node is None:
         raise HTTPException(status_code=404, detail="Node not found")
