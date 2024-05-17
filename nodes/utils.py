@@ -1,6 +1,6 @@
 from dependencies import CommonDB
 from nodes import models, crud
-from nodes.crud import crud_workflow
+from nodes.crud import crud_workflow, crud_condition, crud_message
 from nodes.models import ConditionEdges
 
 
@@ -33,7 +33,11 @@ def execute_workflow(db: CommonDB, workflow_id: int):
                 if condition.parent_id == current_node.id:
                     association = condition
 
-                if current_node.parent_node_id == condition.id:
+                if (
+                    current_node.parent_node_id == condition.id
+                    and current_node.parent_condition_edge_id
+                    == condition.edge.id
+                ):
                     if condition.edge == ConditionEdges.YES:
                         association = end_node
                     if condition.edge == ConditionEdges.NO:
@@ -47,19 +51,26 @@ def execute_workflow(db: CommonDB, workflow_id: int):
             association = current_node
 
             for condition in conditions:
-                print(condition.condition.split(" ")[-1].lower())
+                print(
+                    "conditionname", condition.condition.split(" ")[-1].lower()
+                )
 
                 if current_node.condition == condition.condition:
+                    # TODO: add exception handling
+                    parent_message_node = crud_message.get_message_node_detail(
+                        db=db, node_id=current_node.parent_message_node_id
+                    )
+
                     if (
                         condition.condition.split(" ")[-1].lower()
-                        == current_node.message_node.status.lower()
+                        == parent_message_node.status.lower()
                     ):
-                        current_node.edge = ConditionEdges.YES
+                        current_node.edge.edge = ConditionEdges.YES
                     elif (
                         condition.condition.split(" ")[-1].lower()
-                        != current_node.message_node.status.lower()
+                        != parent_message_node.status.lower()
                     ):
-                        current_node.edge = ConditionEdges.NO
+                        current_node.edge.edge = ConditionEdges.NO
 
                 if (
                     condition.parent_node_id == current_node.id

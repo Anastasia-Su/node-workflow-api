@@ -17,7 +17,6 @@ def create_condition_node(
 ) -> models.ConditionNode:
     db_node = models.ConditionNode(
         condition=node.condition,
-        edge=node.edge,
         parent_node_id=node.parent_node_id,
         parent_message_node_id=node.parent_message_node_id,
     )

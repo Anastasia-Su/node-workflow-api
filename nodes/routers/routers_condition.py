@@ -2,7 +2,8 @@ from fastapi import HTTPException, APIRouter
 
 from dependencies import CommonDB
 from nodes import models, schemas
-from nodes.crud import crud_condition
+from nodes.crud import crud_condition, crud_condition_edge
+from nodes.models import ConditionEdges
 
 router = APIRouter()
 
@@ -56,7 +57,25 @@ def create_condition_node_endpoint(
             detail=f"Parent message node with id {condition_node.parent_message_node_id} not found",
         )
 
-    return crud_condition.create_condition_node(db=db, node=condition_node)
+    new_condition_node = crud_condition.create_condition_node(
+        db=db, node=condition_node
+    )
+
+    crud_condition_edge.create_condition_edge(
+        db=db,
+        edge=schemas.ConditionEdgeCreate(
+            condition_node_id=new_condition_node.id, edge=ConditionEdges.YES
+        ),
+    )
+
+    crud_condition_edge.create_condition_edge(
+        db=db,
+        edge=schemas.ConditionEdgeCreate(
+            condition_node_id=new_condition_node.id, edge=ConditionEdges.NO
+        ),
+    )
+
+    return new_condition_node
 
 
 @router.put(

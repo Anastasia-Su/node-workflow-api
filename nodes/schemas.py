@@ -1,8 +1,9 @@
 from enum import StrEnum
+from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Extra
 
-from nodes.models import MessageStatuses
+from nodes.models import MessageStatuses, ConditionEdges
 
 
 class StartNodeBase(BaseModel):
@@ -28,6 +29,7 @@ class MessageNodeBase(BaseModel):
 
 class MessageNodeCreate(MessageNodeBase):
     parent_node_id: int | None = None
+    parent_condition_edge_id: int | None = None
 
 
 class MessageNode(MessageNodeCreate):
@@ -36,7 +38,6 @@ class MessageNode(MessageNodeCreate):
 
 class ConditionNodeBase(BaseModel):
     condition: str
-    edge: StrEnum
 
 
 class ConditionNodeCreate(ConditionNodeBase):
@@ -45,6 +46,18 @@ class ConditionNodeCreate(ConditionNodeBase):
 
 
 class ConditionNode(ConditionNodeCreate):
+    id: int
+
+
+class ConditionEdgeBase(BaseModel):
+    edge: ConditionEdges | None = None
+
+
+class ConditionEdgeCreate(ConditionEdgeBase):
+    condition_node_id: int | None = None
+
+
+class ConditionEdge(ConditionEdgeCreate):
     id: int
 
 

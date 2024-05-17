@@ -31,6 +31,7 @@ class NodeTypes(StrEnum):
     START = auto()
     MESSAGE = auto()
     CONDITION = auto()
+    CONDITION_EDGE = auto()
     END = auto()
 
 
@@ -48,6 +49,14 @@ class Node(Base):
         "polymorphic_identity": "node",
         "polymorphic_on": node_type,
     }
+
+
+class ConditionEdge(Base):
+    __tablename__ = "condition_edge"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    condition_node_id = Column(Integer, ForeignKey("condition.id"))
+    edge = Column(Enum(ConditionEdges))
 
 
 class StartNode(Node):
@@ -81,6 +90,9 @@ class MessageNode(Node):
     text = Column(String(511), nullable=False)
 
     parent_node_id = Column(Integer, ForeignKey("node.id"), nullable=True)
+    parent_condition_edge_id = Column(
+        Integer, ForeignKey("condition_edge.id"), nullable=True
+    )
 
     # condition_node = relationship(
     #     "ConditionNode",
@@ -116,7 +128,7 @@ class ConditionNode(Node):
     parent_message_node_id = Column(
         Integer, ForeignKey("message.id"), nullable=True
     )
-    edge = Column(Enum(ConditionEdges), nullable=True)
+    edge = relationship("ConditionEdge", uselist=False, backref="condition")
 
     # message_node = relationship(
     #     "MessageNode",
@@ -183,6 +195,7 @@ class Workflow(Base):
         secondary=workflow_message_association,
         secondaryjoin="MessageNode.id == workflow_message_association.c.message_node_id",
         backref="workflows",
+        overlaps="workflow_message_nodes",
         # foreign_keys=[message_node_ids],
     )
 
@@ -193,6 +206,7 @@ class Workflow(Base):
         secondary=workflow_condition_association,
         secondaryjoin="ConditionNode.id == workflow_condition_association.c.condition_node_id",
         backref="workflows",
+        overlaps="workflow_condition_nodes",
         # foreign_keys=[condition_node_ids],
     )
 

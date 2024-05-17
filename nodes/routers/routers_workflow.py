@@ -1,3 +1,5 @@
+import json
+
 from nodes.utils import execute_workflow
 
 
@@ -22,7 +24,7 @@ def read_workflows(
     "/workflows/{workflow_id}/",
     response_model=schemas.Workflow,
 )
-def read_single_workflow(workflow_id: int, db: CommonDB) -> models.Workflow:
+def read_single_workflow(workflow_id: int, db: CommonDB) -> schemas.Workflow:
     db_workflow_node = crud_workflow.get_workflow_detail(
         db=db, node_id=workflow_id
     )
@@ -38,6 +40,9 @@ def create_workflow_endpoint(
     workflow: schemas.WorkflowCreate,
     db: CommonDB,
 ) -> models.Workflow:
+    #
+    # workflow.message_node_ids = json.dumps(workflow.message_node_ids)
+    # workflow.condition_node_ids = json.dumps(workflow.condition_node_ids)
 
     return crud_workflow.create_workflow(db=db, node=workflow)
 
@@ -50,15 +55,13 @@ def update_workflow_endpoint(
     node_id: int, node: schemas.WorkflowCreate, db: CommonDB
 ):
     db_node = crud_workflow.update_workflow(
-        db=db,
-        node_id=node_id,
-        new_start_node=node.start_node,
-        new_message_nodes=node.message_nodes,
-        new_condition_nodes=node.condition_nodes,
-        new_end_node=node.end_node,
+        db=db, node_id=node_id, new_node=node
     )
+
     if db_node is None:
-        raise HTTPException(status_code=404, detail="Workflow not found")
+        raise HTTPException(
+            status_code=404, detail=f"Workflow with id {node_id} not found"
+        )
 
     return db_node
 
@@ -73,6 +76,22 @@ def delete_workflow(node_id: int, db: CommonDB):
         raise HTTPException(status_code=404, detail="Workflow not found")
 
     return db_node
+
+
+@router.post("/workflows/{workflow_id}/execute")
+def run_workflow(db: CommonDB, workflow_id: int):
+    db_workflow_node = crud_workflow.get_workflow_detail(
+        db=db, node_id=workflow_id
+    )
+    start_node = db_workflow_node.start_node
+    if not start_node:
+        raise HTTPException(status_code=404, detail="Start node not found")
+
+    try:
+        execute_workflow(db=db, workflow_id=workflow_id)
+        return {"message": "Workflow executed successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 #
@@ -122,19 +141,3 @@ def delete_workflow(node_id: int, db: CommonDB):
 #
 #     return {"message": "Workflow executed successfully"}
 #
-
-#
-# @router.post("/workflows/{workflow_id}/execute")
-# def execute_workflow(db: CommonDB, workflow_id: int):
-#     db_workflow_node = crud_workflow.get_workflow_detail(
-#         db=db, node_id=workflow_id
-#     )
-#     start_node = db_workflow_node.start_node
-#     if not start_node:
-#         raise HTTPException(status_code=404, detail="Start node not found")
-#
-#     try:
-#         execute_workflow(start_node)
-#         return {"message": "Workflow executed successfully"}
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))
