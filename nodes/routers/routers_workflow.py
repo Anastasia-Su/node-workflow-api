@@ -78,26 +78,23 @@ def delete_workflow_node(node_id: int, db: CommonDB):
 
 
 #
-#
+# #
 # @router.post("/workflows/{workflow_id}/construct")
-# def construct_workflow(
-#     db: CommonDB
-# ):
-#
-#     messages = crud_message.get_message_node_list(db=db)
-#     conditions = crud_condition.get_condition_node_list(db=db)
-#
-#     # Create a start node
-#     start_node = crud_workflow.get_workflow_detail(
+# def construct_workflow(db: CommonDB, workflow_id: int):
+#     workflow_node = crud_workflow.get_workflow_detail(
 #         db=db, node_id=workflow_id
 #     )
-#     db_node = create_workflow_node(db, start_node)
+#     start_node = workflow_node.start_node
+#     messages = workflow_node.message_nodes
+#     conditions = workflow_node.condition_nodes
+#     end_node = workflow_node.end_node
 #
-#     # Create message nodes
+#     db_node = start_node
+#
 #     for message in messages:
 #         message = crud_message.get_message_node_detail(
-#         db=db, node_id=message.id
-#     )
+#             db=db, node_id=message.id
+#         )
 #         message_node = WorkFlowNodeCreate(
 #             status=message.status, text=message.text
 #         )
@@ -113,11 +110,9 @@ def delete_workflow_node(node_id: int, db: CommonDB):
 #         db_node = create_workflow_node(db, condition_node)
 #         db_node.start_node_id = start_node.id
 #
-# Link nodes together based on your workflow logic
-# You would need to implement this logic based on your requirements
 #
 # return {"message": "Workflow constructed successfully"}
-#
+
 #
 # @router.post("/workflow/run/")
 # def run_workflow(start_node_id: int, db: Session = Depends(get_db)):
