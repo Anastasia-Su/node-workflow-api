@@ -1,24 +1,9 @@
 from enum import auto, StrEnum
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Table
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 
 from database import Base
-
-
-workflow_message_association = Table(
-    "workflow_message_association",
-    Base.metadata,
-    Column("workflow_id", Integer, ForeignKey("workflow.id")),
-    Column("message_node_id", Integer, ForeignKey("message.id")),
-)
-
-workflow_condition_association = Table(
-    "workflow_condition_association",
-    Base.metadata,
-    Column("workflow_id", Integer, ForeignKey("workflow.id")),
-    Column("condition_node_id", Integer, ForeignKey("condition.id")),
-)
 
 
 class MessageStatuses(StrEnum):
@@ -65,12 +50,7 @@ class StartNode(Node):
     id = Column(Integer, ForeignKey("node.id"), primary_key=True)
     message = Column(String(255), nullable=True)
 
-    # message_node_id = Column(Integer, ForeignKey("message.id"), nullable=True)
-    # message_node = relationship(
-    #     "MessageNode",
-    #     back_populates="start_node",
-    #     foreign_keys=[message_node_id],
-    # )
+    workflow_id = Column(Integer, ForeignKey("workflow.id"), nullable=True)
 
     workflow = relationship(
         "Workflow",
@@ -94,20 +74,10 @@ class MessageNode(Node):
         Integer, ForeignKey("condition_edge.id"), nullable=True
     )
 
-    # condition_node = relationship(
-    #     "ConditionNode",
-    #     back_populates="message_node",
-    # )
-    #
-    # start_node = relationship(
-    #     "StartNode",
-    #     back_populates="message_node",
-    # )
-
+    workflow_id = Column(Integer, ForeignKey("workflow.id"), nullable=True)
     workflow = relationship(
         "Workflow",
-        secondary=workflow_message_association,
-        backref="workflow_message_nodes",
+        back_populates="message_nodes",
     )
 
     __mapper_args__ = {
@@ -122,24 +92,17 @@ class ConditionNode(Node):
     id = Column(Integer, ForeignKey("node.id"), primary_key=True)
     condition = Column(String, nullable=False)
 
-    # message_node_id = Column(Integer, ForeignKey("message.id"), nullable=True)
-
     parent_node_id = Column(Integer, ForeignKey("node.id"), nullable=True)
     parent_message_node_id = Column(
         Integer, ForeignKey("message.id"), nullable=True
     )
     edge = relationship("ConditionEdge", uselist=False, backref="condition")
 
-    # message_node = relationship(
-    #     "MessageNode",
-    #     back_populates="condition_node",
-    #     # foreign_keys=[message_node_id],
-    # )
+    workflow_id = Column(Integer, ForeignKey("workflow.id"), nullable=True)
 
     workflow = relationship(
         "Workflow",
-        secondary=workflow_condition_association,
-        backref="workflow_condition_nodes",
+        back_populates="condition_nodes",
     )
 
     __mapper_args__ = {
@@ -155,20 +118,15 @@ class EndNode(Node):
 
     message = Column(String(255), nullable=True)
 
-    # message_node_id = Column(Integer, ForeignKey("message.id"), nullable=True)
     parent_message_node_id = Column(
         Integer, ForeignKey("message.id"), nullable=True
     )
 
-    message_node = relationship(
-        "MessageNode",
-        # back_populates="end_node",
-        foreign_keys=[parent_message_node_id],
-    )
+    workflow_id = Column(Integer, ForeignKey("workflow.id"), nullable=True)
 
     workflow = relationship(
         "Workflow",
-        back_populates="end_node",
+        back_populates="end_nodes",
     )
 
     __mapper_args__ = {
@@ -180,35 +138,23 @@ class Workflow(Base):
     __tablename__ = "workflow"
 
     id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False, unique=True)
 
-    start_node_id = Column(Integer, ForeignKey("start.id"))
     start_node = relationship(
-        "StartNode",
-        back_populates="workflow",
-        foreign_keys=[start_node_id],
+        "StartNode", back_populates="workflow", uselist=False
     )
 
-    message_node_ids = Column(String)
     message_nodes = relationship(
         "MessageNode",
-        primaryjoin="Workflow.id == workflow_message_association.c.workflow_id",
-        secondary=workflow_message_association,
-        secondaryjoin="MessageNode.id == workflow_message_association.c.message_node_id",
-        backref="workflows",
-        overlaps="workflow_message_nodes",
-        # foreign_keys=[message_node_ids],
+        back_populates="workflow",
     )
 
-    condition_node_ids = Column(String)
     condition_nodes = relationship(
         "ConditionNode",
-        primaryjoin="Workflow.id == workflow_condition_association.c.workflow_id",
-        secondary=workflow_condition_association,
-        secondaryjoin="ConditionNode.id == workflow_condition_association.c.condition_node_id",
-        backref="workflows",
-        overlaps="workflow_condition_nodes",
-        # foreign_keys=[condition_node_ids],
+        back_populates="workflow",
     )
 
-    end_node_id = Column(Integer, ForeignKey("end.id"))
-    end_node = relationship("EndNode", back_populates="workflow")
+    end_nodes = relationship(
+        "EndNode",
+        back_populates="workflow",
+    )

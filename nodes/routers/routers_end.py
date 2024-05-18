@@ -30,6 +30,7 @@ def create_end_node_endpoint(
     end_node: schemas.EndNodeCreate,
     db: CommonDB,
 ) -> models.EndNode:
+
     parent_message_node = db.query(models.Node).get(
         end_node.parent_message_node_id
     )

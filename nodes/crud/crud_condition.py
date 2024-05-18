@@ -19,6 +19,7 @@ def create_condition_node(
         condition=node.condition,
         parent_node_id=node.parent_node_id,
         parent_message_node_id=node.parent_message_node_id,
+        workflow_id=node.workflow_id,
     )
     db.add(db_node)
     db.commit()
@@ -36,6 +37,7 @@ def update_condition_node(
         node.edge = new_node.edge
         node.parent_node_id = new_node.parent_node_id
         node.parent_message_node_id = new_node.parent_message_node_id
+        node.workflow_id = new_node.workflow_id
 
         db.commit()
         db.refresh(node)

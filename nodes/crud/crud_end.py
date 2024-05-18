@@ -18,6 +18,7 @@ def create_end_node(
     db_node = models.EndNode(
         message=node.message,
         parent_message_node_id=node.parent_message_node_id,
+        workflow_id=node.workflow_id,
     )
 
     db.add(db_node)
@@ -36,6 +37,7 @@ def update_end_node(
     if node:
         node.message = new_node.message
         node.parent_message_node_id = new_node.parent_message_node_id
+        node.workflow_id = new_node.workflow_id
 
         db.commit()
         db.refresh(node)

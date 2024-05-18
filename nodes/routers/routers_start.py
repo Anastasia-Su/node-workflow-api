@@ -48,7 +48,7 @@ def update_start_node_endpoint(
     db_node = crud_start.update_start_node(
         db=db,
         node_id=node_id,
-        new_message=node.message,
+        new_node=node,
     )
 
     if db_node is None:

@@ -11,11 +11,15 @@ class StartNodeBase(BaseModel):
 
 
 class StartNodeCreate(StartNodeBase):
-    pass
+    workflow_id: int | None = None
 
 
-class StartNode(StartNodeBase):
+class StartNode(StartNodeCreate):
     id: int
+
+    class Config:
+        from_attributes = True
+        orm_mode = True
 
 
 class MessageNodeBase(BaseModel):
@@ -30,6 +34,7 @@ class MessageNodeBase(BaseModel):
 class MessageNodeCreate(MessageNodeBase):
     parent_node_id: int | None = None
     parent_condition_edge_id: int | None = None
+    workflow_id: int | None = None
 
 
 class MessageNode(MessageNodeCreate):
@@ -43,6 +48,7 @@ class ConditionNodeBase(BaseModel):
 class ConditionNodeCreate(ConditionNodeBase):
     parent_node_id: int | None = None
     parent_message_node_id: int | None = None
+    workflow_id: int | None = None
 
 
 class ConditionNode(ConditionNodeCreate):
@@ -67,6 +73,7 @@ class EndNodeBase(BaseModel):
 
 class EndNodeCreate(EndNodeBase):
     parent_message_node_id: int | None = None
+    workflow_id: int | None = None
 
 
 class EndNode(EndNodeCreate):
@@ -74,15 +81,19 @@ class EndNode(EndNodeCreate):
 
 
 class WorkflowBase(BaseModel):
-    pass
+    name: str
 
 
 class WorkflowCreate(WorkflowBase):
-    start_node_id: int
-    message_node_ids: list[int]
-    condition_node_ids: list[int]
-    end_node_id: int
+    pass
 
 
 class Workflow(WorkflowCreate):
     id: int
+    start_node: StartNode | None = None
+    message_nodes: list[MessageNode]
+    condition_nodes: list[ConditionNode]
+    end_nodes: list[EndNode]
+
+    class Config:
+        from_attributes = True

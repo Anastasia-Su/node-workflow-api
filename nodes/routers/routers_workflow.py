@@ -78,7 +78,7 @@ def delete_workflow(node_id: int, db: CommonDB):
     return db_node
 
 
-@router.post("/workflows/{workflow_id}/execute")
+@router.post("/workflows/execute")
 def run_workflow(db: CommonDB, workflow_id: int):
     db_workflow_node = crud_workflow.get_workflow_detail(
         db=db, node_id=workflow_id

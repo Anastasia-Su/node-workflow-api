@@ -14,7 +14,9 @@ def create_start_node(
     db: Session, node: schemas.StartNodeCreate
 ) -> models.StartNode:
 
-    db_node = models.StartNode(message=node.message)
+    db_node = models.StartNode(
+        message=node.message, workflow_id=node.workflow_id
+    )
     db.add(db_node)
     db.commit()
     db.refresh(db_node)
@@ -25,11 +27,13 @@ def create_start_node(
 def update_start_node(
     db: Session,
     node_id: int,
-    new_message: str,
+    new_node: schemas.StartNodeCreate,
 ) -> models.StartNode:
+
     node = db.get(models.StartNode, node_id)
     if node:
-        node.message = new_message
+        node.message = new_node.message
+        node.workflow_id = new_node.workflow_id
 
         db.commit()
         db.refresh(node)
