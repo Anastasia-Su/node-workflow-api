@@ -17,10 +17,6 @@ class StartNodeCreate(StartNodeBase):
 class StartNode(StartNodeCreate):
     id: int
 
-    class Config:
-        from_attributes = True
-        orm_mode = True
-
 
 class MessageNodeBase(BaseModel):
     status: MessageStatuses
