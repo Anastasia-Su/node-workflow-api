@@ -2,9 +2,10 @@ import logging
 import time
 
 from dependencies import CommonDB
-from nodes import models, crud
-from nodes.crud import crud_workflow, crud_condition, crud_message
+from nodes import models
+from nodes.crud import crud_workflow, crud_message
 from nodes.models import ConditionEdges
+from utils.graph import graph_build
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -15,9 +16,11 @@ def execute_workflow(db: CommonDB, workflow_id: int):
         db=db, node_id=workflow_id
     )
     start_node = workflow_node.start_node
-    messages = workflow_node.message_nodes
-    conditions = workflow_node.condition_nodes
-    end_node = workflow_node.end_nodes
+    message_nodes = workflow_node.message_nodes
+    condition_nodes = workflow_node.condition_nodes
+    end_nodes = workflow_node.end_nodes
+
+    graph_build(start_node, message_nodes, condition_nodes, end_nodes)
 
     current_node = start_node
     iteration_count = 0
@@ -32,7 +35,7 @@ def execute_workflow(db: CommonDB, workflow_id: int):
         if isinstance(current_node, models.StartNode):
             print("Start Node Logic")
             association = start_node
-            for message in messages:
+            for message in message_nodes:
                 if message.parent_node_id == current_node.id:
                     association = message
                     break
@@ -49,7 +52,7 @@ def execute_workflow(db: CommonDB, workflow_id: int):
 
             association = None
 
-            for condition in conditions:
+            for condition in condition_nodes:
                 if condition.parent_node_id == current_node.id:
                     association = condition
                     break
@@ -60,11 +63,21 @@ def execute_workflow(db: CommonDB, workflow_id: int):
                     == condition.edge.id
                 ):
                     if condition.edge == ConditionEdges.YES:
-                        association = end_node
-                        break
+                        for end_node in end_nodes:
+                            if (
+                                end_node.parent_message_node_id
+                                == current_node.id
+                            ):
+                                association = end_node
+                                break
                     if condition.edge == ConditionEdges.NO:
-                        association = end_node
-                        break
+                        for end_node in end_nodes:
+                            if (
+                                end_node.parent_message_node_id
+                                == current_node.id
+                            ):
+                                association = end_node
+                                break
 
             if association is None:
                 logger.error(
@@ -79,7 +92,7 @@ def execute_workflow(db: CommonDB, workflow_id: int):
             logger.debug("Condition Node Logic")
             association = None
 
-            for condition in conditions:
+            for condition in condition_nodes:
 
                 if current_node.condition == condition.condition:
                     parent_message_node = crud_message.get_message_node_detail(
@@ -104,7 +117,7 @@ def execute_workflow(db: CommonDB, workflow_id: int):
                     association = condition
                     break
             if association is None:
-                for message in messages:
+                for message in message_nodes:
                     if (
                         message.parent_node_id == current_node.id
                         and current_node.edge == ConditionEdges.YES
