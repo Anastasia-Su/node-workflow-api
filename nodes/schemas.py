@@ -68,7 +68,7 @@ class EndNodeBase(BaseModel):
 
 
 class EndNodeCreate(EndNodeBase):
-    parent_message_node_id: int | None = None
+    parent_node_id: int | None = None
     workflow_id: int | None = None
 
 

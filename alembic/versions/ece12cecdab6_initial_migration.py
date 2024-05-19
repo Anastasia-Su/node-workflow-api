@@ -1,8 +1,8 @@
 """'initial_migration'
 
-Revision ID: f546cda0569c
+Revision ID: ece12cecdab6
 Revises: 
-Create Date: 2024-05-18 11:45:36.588950
+Create Date: 2024-05-19 22:20:04.695916
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'f546cda0569c'
+revision: str = 'ece12cecdab6'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -41,7 +41,7 @@ def upgrade() -> None:
     )
     op.create_table('message',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('status', sa.Enum('PENDING', 'SENT', 'OPENED', name='messagestatuses'), nullable=False),
+    sa.Column('status', sa.Enum('PENDING', 'SENT', 'OPEN', name='messagestatuses'), nullable=False),
     sa.Column('text', sa.String(length=511), nullable=False),
     sa.Column('parent_node_id', sa.Integer(), nullable=True),
     sa.Column('parent_condition_edge_id', sa.Integer(), nullable=True),
@@ -67,10 +67,10 @@ def upgrade() -> None:
     op.create_table('end',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('message', sa.String(length=255), nullable=True),
-    sa.Column('parent_message_node_id', sa.Integer(), nullable=True),
+    sa.Column('parent_node_id', sa.Integer(), nullable=True),
     sa.Column('workflow_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['id'], ['node.id'], ),
-    sa.ForeignKeyConstraint(['parent_message_node_id'], ['message.id'], ),
+    sa.ForeignKeyConstraint(['parent_node_id'], ['message.id'], ),
     sa.ForeignKeyConstraint(['workflow_id'], ['workflow.id'], ),
     sa.PrimaryKeyConstraint('id')
     )

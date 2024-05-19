@@ -9,7 +9,7 @@ from database import Base
 class MessageStatuses(StrEnum):
     PENDING = auto()
     SENT = auto()
-    OPENED = auto()
+    OPEN = auto()
 
 
 class NodeTypes(StrEnum):
@@ -118,9 +118,7 @@ class EndNode(Node):
 
     message = Column(String(255), nullable=True)
 
-    parent_message_node_id = Column(
-        Integer, ForeignKey("message.id"), nullable=True
-    )
+    parent_node_id = Column(Integer, ForeignKey("message.id"), nullable=True)
 
     workflow_id = Column(Integer, ForeignKey("workflow.id"), nullable=True)
 

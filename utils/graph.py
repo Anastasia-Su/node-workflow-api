@@ -4,7 +4,7 @@ from matplotlib import pyplot
 from nodes import models
 
 
-def graph_build(
+def build_graph(
     start_node: models.StartNode,
     message_nodes: list[models.MessageNode],
     condition_nodes: list[models.ConditionNode],
@@ -16,6 +16,17 @@ def graph_build(
     G.add_nodes_from(message_nodes)
     G.add_nodes_from(condition_nodes)
     G.add_nodes_from(end_nodes)
+
+    combined_nodes = message_nodes + condition_nodes + end_nodes
+
+    for node in combined_nodes:
+        if hasattr(node, "parent_node_id") and node.parent_node_id is not None:
+            parent_node = next(
+                (n for n in combined_nodes if n.id == node.parent_node_id),
+                None,
+            )
+            if parent_node:
+                G.add_edge(parent_node, node)
 
     node_color_map = {
         models.StartNode: "lightgreen",

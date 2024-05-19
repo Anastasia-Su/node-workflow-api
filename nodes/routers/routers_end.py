@@ -31,14 +31,12 @@ def create_end_node_endpoint(
     db: CommonDB,
 ) -> models.EndNode:
 
-    parent_message_node = db.query(models.Node).get(
-        end_node.parent_message_node_id
-    )
+    parent_message_node = db.query(models.Node).get(end_node.parent_node_id)
 
     if not parent_message_node:
         raise HTTPException(
             status_code=404,
-            detail=f"Parent message node with id {end_node.parent_message_node_id} not found",
+            detail=f"Parent message node with id {end_node.parent_node_id} not found",
         )
 
     return crud_end.create_end_node(db=db, node=end_node)
@@ -51,14 +49,12 @@ def create_end_node_endpoint(
 def update_end_node_endpoint(
     node_id: int, node: schemas.EndNodeCreate, db: CommonDB
 ):
-    parent_message_node = db.query(models.Node).get(
-        node.parent_message_node_id
-    )
+    parent_message_node = db.query(models.Node).get(node.parent_node_id)
 
     if not parent_message_node:
         raise HTTPException(
             status_code=404,
-            detail=f"Parent message node with id {node.parent_message_node_id} not found",
+            detail=f"Parent message node with id {node.parent_node_id} not found",
         )
 
     db_node = crud_end.update_end_node(

@@ -4,8 +4,8 @@ import time
 from dependencies import CommonDB
 from nodes import models
 from nodes.crud import crud_workflow, crud_message
-from nodes.models import ConditionEdges
-from utils.graph import graph_build
+from nodes.models import ConditionEdges, ConditionEdge
+from utils.graph import build_graph
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -20,8 +20,6 @@ def execute_workflow(db: CommonDB, workflow_id: int):
     condition_nodes = workflow_node.condition_nodes
     end_nodes = workflow_node.end_nodes
 
-    graph_build(start_node, message_nodes, condition_nodes, end_nodes)
-
     current_node = start_node
     iteration_count = 0
     num_of_iterations = 20
@@ -33,106 +31,88 @@ def execute_workflow(db: CommonDB, workflow_id: int):
         iteration_count += 1
 
         if isinstance(current_node, models.StartNode):
-            print("Start Node Logic")
-            association = start_node
-            for message in message_nodes:
-                if message.parent_node_id == current_node.id:
-                    association = message
-                    break
-
-            if association is None:
+            logger.debug("Start Node Logic")
+            next_node = next(
+                (
+                    node
+                    for node in message_nodes
+                    if node.parent_node_id == current_node.id
+                ),
+                None,
+            )
+            if not next_node:
                 logger.error("No associated message node found for start node")
                 break
-
-            current_node = association
-            logger.debug(f"Next node: {current_node}")
+            current_node = next_node
 
         elif isinstance(current_node, models.MessageNode):
             logger.debug("Message Node Logic")
-
-            association = None
-
-            for condition in condition_nodes:
-                if condition.parent_node_id == current_node.id:
-                    association = condition
-                    break
-
-                if (
-                    current_node.parent_node_id == condition.id
-                    and current_node.parent_condition_edge_id
-                    == condition.edge.id
-                ):
-                    if condition.edge == ConditionEdges.YES:
-                        for end_node in end_nodes:
-                            if (
-                                end_node.parent_message_node_id
-                                == current_node.id
-                            ):
-                                association = end_node
-                                break
-                    if condition.edge == ConditionEdges.NO:
-                        for end_node in end_nodes:
-                            if (
-                                end_node.parent_message_node_id
-                                == current_node.id
-                            ):
-                                association = end_node
-                                break
-
-            if association is None:
+            next_node = next(
+                (
+                    node
+                    for node in condition_nodes
+                    if node.parent_node_id == current_node.id
+                ),
+                None,
+            )
+            if not next_node:
+                next_node = next(
+                    (
+                        end_node
+                        for end_node in end_nodes
+                        if end_node.parent_node_id == current_node.id
+                    ),
+                    None,
+                )
+            if not next_node:
                 logger.error(
-                    "No associated condition node found for message node"
+                    "No associated condition or end node found for message node"
                 )
                 break
-
-            current_node = association
-            logger.debug(f"Next node: {current_node}")
+            current_node = next_node
 
         elif isinstance(current_node, models.ConditionNode):
             logger.debug("Condition Node Logic")
-            association = None
-
-            for condition in condition_nodes:
-
-                if current_node.condition == condition.condition:
-                    parent_message_node = crud_message.get_message_node_detail(
-                        db=db, node_id=current_node.parent_message_node_id
-                    )
-
-                    if (
-                        condition.condition.split(" ")[-1].lower()
-                        == parent_message_node.status.lower()
-                    ):
-                        current_node.edge.edge = ConditionEdges.YES
-                    elif (
-                        condition.condition.split(" ")[-1].lower()
-                        != parent_message_node.status.lower()
-                    ):
-                        current_node.edge.edge = ConditionEdges.NO
-
+            parent_message_node = next(
+                (
+                    node
+                    for node in message_nodes
+                    if node.id == current_node.parent_message_node_id
+                ),
+                None,
+            )
+            if parent_message_node:
                 if (
-                    condition.parent_node_id == current_node.id
-                    and current_node.edge == ConditionEdges.NO
+                    current_node.condition.split(" ")[-1].lower()
+                    == parent_message_node.status.lower()
                 ):
-                    association = condition
-                    break
-            if association is None:
-                for message in message_nodes:
-                    if (
-                        message.parent_node_id == current_node.id
-                        and current_node.edge == ConditionEdges.YES
-                    ):
-                        association = message
-                        break
+                    current_node.edge = ConditionEdge(edge=ConditionEdges.YES)
+                else:
+                    current_node.edge = ConditionEdge(edge=ConditionEdges.NO)
 
-            if association is None:
-                logger.error(
-                    "No associated message or condition node found for condition node"
+                next_node = next(
+                    (
+                        node
+                        for node in message_nodes
+                        if node.parent_node_id == current_node.id
+                        and current_node.edge.edge == ConditionEdges.YES
+                    ),
+                    None,
                 )
-                break
-
-            current_node = association
-            logger.debug(f"Next node: {current_node}")
+                if not next_node:
+                    next_node = next(
+                        (
+                            node
+                            for node in condition_nodes
+                            if node.parent_node_id == current_node.id
+                            and current_node.edge.edge == ConditionEdges.NO
+                        ),
+                        None,
+                    )
+                if not next_node:
+                    logger.error("No associated node found for condition node")
+                    break
+                current_node = next_node
 
         elif isinstance(current_node, models.EndNode):
             logger.debug("End Node Logic")
@@ -151,3 +131,5 @@ def execute_workflow(db: CommonDB, workflow_id: int):
 
     end = time.time()
     logger.debug(f"Workflow execution time: {end - start}")
+
+    build_graph(start_node, message_nodes, condition_nodes, end_nodes)
