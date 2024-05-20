@@ -22,7 +22,7 @@ class MessageNodeBase(BaseModel):
     status: MessageStatuses
     text: str
 
-    class Config:
+    class ConfigDict:
         arbitrary_types_allowed = True
         from_attributes = True
 
@@ -91,5 +91,5 @@ class Workflow(WorkflowCreate):
     condition_nodes: list[ConditionNode]
     end_nodes: list[EndNode]
 
-    class Config:
+    class ConfigDict:
         from_attributes = True

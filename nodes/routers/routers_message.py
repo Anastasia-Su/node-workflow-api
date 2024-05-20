@@ -1,8 +1,9 @@
-from fastapi import HTTPException, APIRouter
+from fastapi import HTTPException, APIRouter, status
 
 from dependencies import CommonDB
 from nodes import models, schemas
 from nodes.crud import crud_message
+from nodes.models import NodeTypes
 
 router = APIRouter()
 
@@ -26,7 +27,10 @@ def read_single_message_node(
     )
 
     if db_message_node is None:
-        raise HTTPException(status_code=404, detail="Node not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Node with id {message_node_id} not found",
+        )
 
     return db_message_node
 
@@ -38,10 +42,37 @@ def create_message_node_endpoint(
 ) -> models.MessageNode:
 
     parent_node = db.query(models.Node).get(message_node.parent_node_id)
+    message_node_list = crud_message.get_message_node_list(db=db)
 
-    if not parent_node:
+    existing_message_node = next(
+        (
+            existing_message
+            for existing_message in message_node_list
+            if existing_message.parent_node_id == message_node.parent_node_id
+            and message_node.workflow_id == existing_message.workflow_id
+        ),
+        None,
+    )
+    if parent_node:
+        if (
+            parent_node.workflow_id != 0
+            and message_node.parent_node_id != 0
+            and message_node.workflow_id != parent_node.workflow_id
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Parent node is from different workflow: {parent_node.workflow_id}.",
+            )
+
+        if parent_node.node_type == NodeTypes.START and existing_message_node:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Another message node is already assigned to this start node.",
+            )
+
+    if message_node.parent_node_id != 0 and not parent_node:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Parent node with id {message_node.parent_node_id} not found",
         )
 
@@ -57,9 +88,9 @@ def update_message_node_endpoint(
 ):
     parent_node = db.query(models.Node).get(node.parent_node_id)
 
-    if not parent_node:
+    if node.parent_node_id != 0 and not parent_node:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Parent node with id {node.parent_node_id} not found",
         )
 
@@ -69,7 +100,8 @@ def update_message_node_endpoint(
 
     if db_node is None:
         raise HTTPException(
-            status_code=404, detail=f"Node with id {node_id} not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Node with id {node_id} not found",
         )
 
     return db_node
@@ -81,6 +113,9 @@ def update_message_node_endpoint(
 def delete_message_node(node_id: int, db: CommonDB):
     db_node = crud_message.delete_message_node(db=db, node_id=node_id)
     if db_node is None:
-        raise HTTPException(status_code=404, detail="Node not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Node with id {node_id} not found",
+        )
 
     return db_node
