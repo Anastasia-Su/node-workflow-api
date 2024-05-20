@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 
 
 def build_graph(G: nx.DiGraph) -> None:
+    plt.figure(figsize=(10, 8))
     node_color_map = {
         "Start Node": "lightgreen",
         "Message Node": "lightblue",
@@ -44,12 +45,16 @@ def build_graph(G: nx.DiGraph) -> None:
             wrapped_text,
             horizontalalignment="center",
             verticalalignment="center",
-            fontsize=10,
+            fontsize=12,
             bbox=dict(
                 facecolor=node_color_map[G.nodes[node]["label"]],
                 boxstyle="round,pad=0.3",
             ),
         )
+
+    edge_labels = nx.get_edge_attributes(G, "label")
+
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=14)
 
     # plt.show()
     plt.savefig("workflow_graph.png", bbox_inches="tight")

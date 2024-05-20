@@ -1,7 +1,10 @@
+import networkx as nx
+
 from utils.utils import execute_workflow
 
 
 from fastapi import HTTPException, APIRouter
+from fastapi.responses import JSONResponse
 
 from dependencies import CommonDB
 from nodes import models, schemas
@@ -38,9 +41,6 @@ def create_workflow_endpoint(
     workflow: schemas.WorkflowCreate,
     db: CommonDB,
 ) -> models.Workflow:
-    #
-    # workflow.message_node_ids = json.dumps(workflow.message_node_ids)
-    # workflow.condition_node_ids = json.dumps(workflow.condition_node_ids)
 
     return crud_workflow.create_workflow(db=db, node=workflow)
 
@@ -81,61 +81,14 @@ def run_workflow(db: CommonDB, workflow_id: int):
     db_workflow_node = crud_workflow.get_workflow_detail(
         db=db, node_id=workflow_id
     )
-    start_node = db_workflow_node.start_node
-    if not start_node:
-        raise HTTPException(status_code=404, detail="Start node not found")
 
     try:
-        execute_workflow(db=db, workflow_id=workflow_id)
-        return {"message": "Workflow executed successfully"}
+        result = execute_workflow(db, workflow_id)
+        response = {
+            "message": "Workflow executed successfully",
+            "execution_time": result["execution_time"],
+            "graph": nx.node_link_data(result["graph"]),
+        }
+        return JSONResponse(content=response)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
-#
-# #
-# @router.post("/workflows/{workflow_id}/construct")
-# def construct_workflow(db: CommonDB, workflow_id: int):
-#     workflow_node = crud_workflow.get_workflow_detail(
-#         db=db, node_id=workflow_id
-#     )
-#     start_node = workflow_node.start_node
-#     messages = workflow_node.message_nodes
-#     conditions = workflow_node.condition_nodes
-#     end_node = workflow_node.end_node
-#
-#     db_node = start_node
-#
-#     for message in messages:
-#         message = crud_message.get_message_node_detail(
-#             db=db, node_id=message.id
-#         )
-#         message_node = WorkFlowNodeCreate(
-#             status=message.status, text=message.text
-#         )
-#         db_node = create_workflow_node(db, message_node)
-#         db_node.start_node_id = start_node.id
-#
-#     # Create condition nodes
-#     for condition_id in condition_ids:
-#         condition = get_condition_from_database(db, condition_id)
-#         condition_node = WorkFlowNodeCreate(
-#             status=MessageStatus.PENDING, text=condition.condition
-#         )
-#         db_node = create_workflow_node(db, condition_node)
-#         db_node.start_node_id = start_node.id
-#
-#
-# return {"message": "Workflow constructed successfully"}
-
-#
-# @router.post("/workflow/run/")
-# def run_workflow(start_node_id: int, db: Session = Depends(get_db)):
-#     # Retrieve the start node from the database
-#     start_node = get_workflow_node(db, start_node_id)
-#
-#     # Run the workflow
-#     run_workflow_logic(start_node)
-#
-#     return {"message": "Workflow executed successfully"}
-#
