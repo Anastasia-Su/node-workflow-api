@@ -1,5 +1,7 @@
 import logging
 import time
+import networkx as nx
+from fastapi import HTTPException
 
 from dependencies import CommonDB
 from nodes import models
@@ -15,14 +17,39 @@ def execute_workflow(db: CommonDB, workflow_id: int):
     workflow_node = crud_workflow.get_workflow_detail(
         db=db, node_id=workflow_id
     )
-    start_node = workflow_node.start_node
-    message_nodes = workflow_node.message_nodes
-    condition_nodes = workflow_node.condition_nodes
-    end_nodes = workflow_node.end_nodes
+    # start_node = workflow_node.start_node.id
+    #     # message_nodes = workflow_node.message_nodes
+    #     # condition_nodes = workflow_node.condition_nodes
+    #     # end_nodes = workflow_node.end_nodes
+
+    start_node = (
+        workflow_node.start_node
+        if workflow_node.start_node.id == workflow_id
+        else None
+    )
+
+    message_nodes = [
+        node
+        for node in workflow_node.message_nodes
+        if node.workflow_id == workflow_id
+    ]
+    condition_nodes = [
+        node
+        for node in workflow_node.condition_nodes
+        if node.workflow_id == workflow_id
+    ]
+    end_nodes = [
+        node
+        for node in workflow_node.end_nodes
+        if node.workflow_id == workflow_id
+    ]
 
     current_node = start_node
+
+    G = nx.DiGraph()
+
     iteration_count = 0
-    num_of_iterations = 20
+    num_of_iterations = 50
 
     start = time.time()
 
@@ -32,6 +59,12 @@ def execute_workflow(db: CommonDB, workflow_id: int):
 
         if isinstance(current_node, models.StartNode):
             logger.debug("Start Node Logic")
+            G.add_node(
+                current_node.id,
+                label="Start Node",
+                message=current_node.message,
+            )
+
             next_node = next(
                 (
                     node
@@ -40,13 +73,26 @@ def execute_workflow(db: CommonDB, workflow_id: int):
                 ),
                 None,
             )
+
             if not next_node:
                 logger.error("No associated message node found for start node")
-                break
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"No associated message node found for start node",
+                )
+
+            G.add_edge(current_node.id, next_node.id)
             current_node = next_node
 
         elif isinstance(current_node, models.MessageNode):
             logger.debug("Message Node Logic")
+            G.add_node(
+                current_node.id,
+                label="Message Node",
+                status=current_node.status,
+                text=current_node.text,
+            )
+
             next_node = next(
                 (
                     node
@@ -68,11 +114,22 @@ def execute_workflow(db: CommonDB, workflow_id: int):
                 logger.error(
                     "No associated condition or end node found for message node"
                 )
-                break
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"No associated condition or end node found for message node",
+                )
+
+            G.add_edge(current_node.id, next_node.id)
             current_node = next_node
 
         elif isinstance(current_node, models.ConditionNode):
             logger.debug("Condition Node Logic")
+            G.add_node(
+                current_node.id,
+                label="Condition Node",
+                condition=current_node.condition,
+            )
+
             parent_message_node = next(
                 (
                     node
@@ -111,16 +168,30 @@ def execute_workflow(db: CommonDB, workflow_id: int):
                     )
                 if not next_node:
                     logger.error("No associated node found for condition node")
-                    break
+
+                    raise HTTPException(
+                        status_code=404,
+                        detail=f"No associated node found for condition node",
+                    )
+
+                G.add_edge(current_node.id, next_node.id)
                 current_node = next_node
 
         elif isinstance(current_node, models.EndNode):
             logger.debug("End Node Logic")
+            G.add_node(
+                current_node.id, label="End Node", message=current_node.message
+            )
+
             current_node = None
 
         else:
             logger.error(f"Unknown node type: {type(current_node)}")
-            break
+
+            raise HTTPException(
+                status_code=404,
+                detail=f"Unknown node type: {type(current_node)}",
+            )
 
     if iteration_count >= num_of_iterations:
         logger.error(
@@ -132,4 +203,4 @@ def execute_workflow(db: CommonDB, workflow_id: int):
     end = time.time()
     logger.debug(f"Workflow execution time: {end - start}")
 
-    build_graph(start_node, message_nodes, condition_nodes, end_nodes)
+    build_graph(G)

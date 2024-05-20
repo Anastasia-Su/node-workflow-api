@@ -69,8 +69,8 @@
      {
        "id": 8,
        "condition": "status == SENT",
-       "parent_node_id": 2,
-       "parent_message_node_id": 2,
+       "parent_node_id": 3,
+       "parent_message_node_id": 3,
        "workflow_id": 1,
        "node_type": "CONDITION"
      },
@@ -78,7 +78,7 @@
        "id": 9,
        "condition": "status == OPEN",
        "parent_node_id": 8,
-       "parent_message_node_id": 2,
+       "parent_message_node_id": 3,
        "workflow_id": 1,
        "node_type": "CONDITION"
      }
