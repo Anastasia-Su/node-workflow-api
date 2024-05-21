@@ -1,9 +1,23 @@
 from sqlalchemy.orm import Session
 from nodes import models, schemas
+from nodes.models import MessageStatuses
 
 
-def get_message_node_list(db: Session) -> list[models.MessageNode]:
-    return db.query(models.MessageNode).all()
+def get_message_node_list(
+    db: Session, text: str | None = None, status: MessageStatuses | None = None
+) -> list[models.MessageNode]:
+    """Retrieve all messages nodes with the option to filter by text and status."""
+
+    message_nodes = db.query(models.MessageNode)
+
+    if status is not None:
+        message_nodes = message_nodes.filter_by(status=status)
+    if text is not None:
+        message_nodes = message_nodes.filter(
+            models.MessageNode.text.ilike(f"%{text}%")
+        )
+
+    return message_nodes.all()
 
 
 def get_message_node_detail(db: Session, node_id: int) -> models.MessageNode:

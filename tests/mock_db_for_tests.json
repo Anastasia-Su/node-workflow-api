@@ -58,14 +58,12 @@
      {
      "id": 1,
      "message": "Start workflow 1",
-     "workflow_id": 1,
-     "node_type": "START"
+     "workflow_id": 1
      },
      {
      "id": 2,
      "message": "Start workflow 2",
-     "workflow_id": 2,
-     "node_type": "START"
+     "workflow_id": 2
      }
    ]
  },
@@ -77,8 +75,7 @@
        "text": "Open status message node",
        "parent_node_id": 1,
        "parent_condition_edge_id": null,
-       "workflow_id": 1,
-       "node_type": "MESSAGE"
+       "workflow_id": 1
      },
      {
        "id": 4,
@@ -86,8 +83,7 @@
        "text": "Sent status message node",
        "parent_node_id": 1,
        "parent_condition_edge_id": null,
-       "workflow_id": 2,
-       "node_type": "MESSAGE"
+       "workflow_id": 2
      },
      {
        "id": 5,
@@ -95,8 +91,7 @@
        "text": "Open: yes",
        "parent_node_id": 9,
        "parent_condition_edge_id": 3,
-       "workflow_id": 1,
-       "node_type": "MESSAGE"
+       "workflow_id": 1
      },
      {
        "id": 6,
@@ -104,8 +99,7 @@
        "text": "Open: no",
        "parent_node_id": 9,
        "parent_condition_edge_id": 4,
-       "workflow_id": 1,
-       "node_type": "MESSAGE"
+       "workflow_id": 1
      },
      {
        "id": 7,
@@ -113,8 +107,7 @@
        "text": "Sent: yes",
        "parent_node_id": 8,
        "parent_condition_edge_id": 1,
-       "workflow_id": 1,
-       "node_type": "MESSAGE"
+       "workflow_id": 1
      }
    ]
  },
@@ -125,16 +118,14 @@
        "condition": "status == SENT",
        "parent_node_id": 3,
        "parent_message_node_id": 3,
-       "workflow_id": 1,
-       "node_type": "CONDITION"
+       "workflow_id": 1
      },
      {
        "id": 9,
        "condition": "status == OPEN",
        "parent_node_id": 8,
        "parent_message_node_id": 3,
-       "workflow_id": 1,
-       "node_type": "CONDITION"
+       "workflow_id": 1
      }
    ]
  },
@@ -145,22 +136,19 @@
        "id": 10,
        "message": "End, if sent: yes",
        "parent_node_id": 7,
-       "workflow_id": 1,
-       "node_type": "END"
+       "workflow_id": 1
      },
      {
        "id": 11,
        "message": "End, if open: yes",
        "parent_node_id": 5,
-       "workflow_id": 1,
-       "node_type": "END"
+       "workflow_id": 1
      },
         {
        "id": 12,
        "message": "End, if open: no",
        "parent_node_id": 6,
-       "workflow_id": 1,
-       "node_type": "END"
+       "workflow_id": 1
      }
     ]
  },

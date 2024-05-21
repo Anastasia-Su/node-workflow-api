@@ -32,7 +32,6 @@ def insert_mock_data(db, data):
                 id=start_node_data["id"],
                 message=start_node_data["message"],
                 workflow_id=start_node_data["workflow_id"],
-                node_type=start_node_data["node_type"],
             )
             db.add(start_node)
             db.commit()
@@ -47,7 +46,6 @@ def insert_mock_data(db, data):
                     "parent_condition_edge_id"
                 ],
                 workflow_id=message_node_data["workflow_id"],
-                node_type=message_node_data["node_type"],
             )
             db.add(message_node)
             db.commit()
@@ -61,7 +59,6 @@ def insert_mock_data(db, data):
                     "parent_message_node_id"
                 ],
                 workflow_id=condition_node_data["workflow_id"],
-                node_type=condition_node_data["node_type"],
             )
             db.add(condition_node)
             db.commit()
@@ -72,7 +69,6 @@ def insert_mock_data(db, data):
                 message=end_node_data["message"],
                 parent_node_id=end_node_data["parent_node_id"],
                 workflow_id=end_node_data["workflow_id"],
-                node_type=end_node_data["node_type"],
             )
             db.add(end_node)
             db.commit()

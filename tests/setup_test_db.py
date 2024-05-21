@@ -55,7 +55,8 @@ def setup_test_db():
         #         id=node_data["id"],
         #         node_type=node_data["node_type"],
         #     )
-        #     if node not in existing_nodes and existing_node is None:
+        #     # if node not in existing_nodes:
+        #     if existing_node is None:
         #         logger.debug(f"Adding node: {node_data['id']}")
         #         db.add(node)
         #     else:
@@ -66,7 +67,6 @@ def setup_test_db():
                 id=start_node_data["id"],
                 message=start_node_data["message"],
                 workflow_id=start_node_data["workflow_id"],
-                node_type=start_node_data["node_type"],
             )
             db.add(start_node)
 
@@ -80,7 +80,6 @@ def setup_test_db():
                     "parent_condition_edge_id"
                 ],
                 workflow_id=message_node_data["workflow_id"],
-                node_type=message_node_data["node_type"],
             )
             db.add(message_node)
 
@@ -93,7 +92,6 @@ def setup_test_db():
                     "parent_message_node_id"
                 ],
                 workflow_id=condition_node_data["workflow_id"],
-                node_type=condition_node_data["node_type"],
             )
             db.add(condition_node)
 
@@ -103,7 +101,6 @@ def setup_test_db():
                 message=end_node_data["message"],
                 parent_node_id=end_node_data["parent_node_id"],
                 workflow_id=end_node_data["workflow_id"],
-                node_type=end_node_data["node_type"],
             )
             db.add(end_node)
 
