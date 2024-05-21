@@ -1,23 +1,11 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session, declarative_base
-from enum import auto, Enum
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum as SQLAEnum
-from sqlalchemy.orm import relationship
-
-from starlette.testclient import TestClient
-
-from dependencies import get_db
-from main import app
-from tests.load_mock_data_for_tests import load_mock_data, insert_mock_data
-
-Base = declarative_base()
+from sqlalchemy.orm import declarative_base
 
 from enum import auto, StrEnum
 
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 
-from database import Base
+Base = declarative_base()
 
 
 class MessageStatuses(StrEnum):
@@ -53,7 +41,7 @@ class Node(Base):
 class ConditionEdge(Base):
     __tablename__ = "condition_edge"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, unique=False)
     condition_node_id = Column(Integer, ForeignKey("condition.id"))
     edge = Column(Enum(ConditionEdges))
 
@@ -170,79 +158,3 @@ class Workflow(Base):
         "EndNode",
         back_populates="workflow",
     )
-
-
-#
-# # Create an in-memory SQLite database engine
-# engine = create_engine(
-#     "sqlite:///:memory:", connect_args={"check_same_thread": False}
-# )
-#
-# # Create a sessionmaker bound to the engine
-# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-#
-# # Create tables in the in-memory database
-# Base.metadata.create_all(bind=engine)
-#
-# # Create a scoped session
-# db = scoped_session(SessionLocal)
-
-# Mock data instances
-# mock_data_start_node = Node(id=1, node_type=NodeTypes.START)
-# mock_data_start = StartNode(id=1, message="Starting", workflow_id=1)
-#
-# mock_data_start2_node = Node(id=2, node_type=NodeTypes.START)
-# mock_data_start2 = StartNode(id=2, message="Starting", workflow_id=1)
-#
-# mock_data_existing_node = Node(id=3, node_type=NodeTypes.MESSAGE)
-# mock_data_existing = MessageNode(
-#     id=3,
-#     status=MessageStatuses.PENDING,
-#     text="Existing message node",
-#     parent_node_id=1,
-#     parent_condition_edge_id=0,
-#     workflow_id=1,
-# )
-#
-# mock_data_existing2_node = Node(id=4, node_type=NodeTypes.MESSAGE)
-# mock_data_existing2 = MessageNode(
-#     id=4,
-#     status=MessageStatuses.PENDING,
-#     text="Existing message node 2",
-#     parent_node_id=2,
-#     parent_condition_edge_id=0,
-#     workflow_id=1,
-# )
-
-# Add mock data to the session
-# db.add_all(
-#     [
-#         mock_data_start_node,
-#         mock_data_start,
-#         mock_data_start2_node,
-#         mock_data_start2,
-#         mock_data_existing_node,
-#         mock_data_existing,
-#         mock_data_existing2_node,
-#         mock_data_existing2,
-#     ]
-# )
-#
-#
-# data = load_mock_data("mock_db.json")
-# insert_mock_data(db, data)
-# db.commit()
-#
-#
-# # Override the get_db dependency in your app
-# def override_get_db():
-#     try:
-#         yield db
-#     finally:
-#         db.remove()
-#
-#
-# app.dependency_overrides[get_db] = override_get_db
-#
-# # Create a TestClient
-# client = TestClient(app)

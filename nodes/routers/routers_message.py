@@ -86,7 +86,7 @@ def create_message_node_endpoint(
 def update_message_node_endpoint(
     message_node_id: int, message_node: schemas.MessageNodeCreate, db: CommonDB
 ):
-    parent_node = db.query(models.Node).get(message_node.parent_node_id)
+    parent_node = db.query(models.StartNode).get(message_node.parent_node_id)
 
     existing_message_node = (
         db.query(models.MessageNode)

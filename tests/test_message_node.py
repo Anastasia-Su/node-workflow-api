@@ -7,115 +7,67 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-from tests.mock_models import Base
+from tests.mock_models import Base, Node
 from dependencies import get_db
 from main import app
-from nodes import models
 from nodes.models import MessageStatuses, NodeTypes
-from tests.load_mock_data_for_tests import load_mock_data, insert_mock_data
 
-# from tests.mock_models import db
+# from tests.load_mock_data_for_tests import load_mock_data, insert_mock_data
+from tests.setup_test_db import setup_test_db
 
-#
-# mock_data_start_node = models.StartNode(
+
+db = setup_test_db()
+# node_start = Node(
 #     id=1,
 #     node_type=NodeTypes.START,
 # )
-#
-# mock_data_start = models.StartNode(
-#     id=mock_data_start_node.id,
-#     message="Starting",
-#     workflow_id=1,
-# )
-#
-#
-# mock_data_start2_node = models.StartNode(
+# node_start2 = Node(
 #     id=2,
 #     node_type=NodeTypes.START,
 # )
 #
-#
-# mock_data_start2 = models.StartNode(
-#     id=mock_data_start2_node.id,
-#     message="Starting",
-#     workflow_id=1,
-#     node_type=NodeTypes.START,
-# )
-#
-#
-# mock_data_existing_node = models.StartNode(
+# node_message = Node(
 #     id=3,
 #     node_type=NodeTypes.MESSAGE,
 # )
-#
-# mock_data_existing = models.MessageNode(
-#     id=mock_data_existing_node.id,
-#     status=MessageStatuses.PENDING,
-#     text="Existing message node",
-#     parent_node_id=1,
-#     parent_condition_edge_id=0,
-#     workflow_id=1,
-# )
-#
-#
-# mock_data_existing2_node = models.StartNode(
+# node_message2 = Node(
 #     id=4,
 #     node_type=NodeTypes.MESSAGE,
 # )
 #
-# mock_data_existing2 = models.MessageNode(
-#     id=mock_data_existing2_node.id,
-#     status=MessageStatuses.PENDING,
-#     text="Existing message node 2",
-#     parent_node_id=2,
-#     parent_condition_edge_id=0,
-#     workflow_id=1,
-# )
-#
-#
-# engine = create_engine(
-#     "sqlite:///:memory:", connect_args={"check_same_thread": False}
-# )
-# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-#
-#
-# # Create tables in the in-memory database
-# models.Base.metadata.create_all(bind=engine)
-# db = SessionLocal()
-#
-# db.add_all(
-#     [
-#         mock_data_start,
-#         mock_data_start_node,
-#         mock_data_start2,
-#         mock_data_start2_node,
-#         mock_data_existing,
-#         mock_data_existing_node,
-#         mock_data_existing2,
-#         mock_data_existing2_node,
-#     ]
-# )
-#
+# db.add(node_start)
+# db.add(node_start2)
+# db.add(node_message)
+# db.add(node_message2)
 # db.commit()
-#
-#
-# # @pytest.fixture
-# # def override_get_db():
-# #     try:
-# #         yield SessionLocal
-# #     finally:
-# #         SessionLocal.close_all()
-#
-#
-# def override_get_db():
-#     try:
-#         yield db
-#     finally:
-#         db.close()
-#
-#
-# app.dependency_overrides[get_db] = override_get_db
-# client = TestClient(app)
+
+
+def override_get_db():
+    try:
+        yield db
+    finally:
+        db.remove()
+
+
+app.dependency_overrides[get_db] = override_get_db
+client = TestClient(app)
+
+
+def test_create_message_node_allowed():
+    new_message_node_data = {
+        "status": MessageStatuses.PENDING,
+        "text": "Test message node",
+        "parent_node_id": 2,
+        # "parent_condition_edge_id": 0,
+        "workflow_id": 1,
+    }
+
+    # db.query(models.MessageNode).get.return_value = mock_data_existing
+
+    response = client.post("/message_nodes/", json=new_message_node_data)
+    # assert response.status_code == 200
+    assert response.json()["detail"] == "hhllllll"
+
 
 #
 # def test_create_message_node_with_assigned_parent_start_node_forbidden(
@@ -201,67 +153,6 @@ from tests.load_mock_data_for_tests import load_mock_data, insert_mock_data
 #
 # # Create a TestClient
 # client = TestClient(app)
-
-
-engine = create_engine(
-    "sqlite:///:memory:", connect_args={"check_same_thread": False}
-)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base.metadata.create_all(bind=engine)
-
-# SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"  # File-based database
-# engine = create_engine(SQLALCHEMY_DATABASE_URL)
-# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-# db = scoped_session(SessionLocal)
-#
-# Base.metadata.create_all(bind=engine)
-
-# Create a scoped session
-db = scoped_session(SessionLocal)
-
-# Load mock data from a JSON file
-current_dir = os.path.dirname(__file__)
-
-# Construct the absolute path to the file
-file_path = os.path.join(current_dir, "mock_db_for_tests.json")
-
-with open(file_path, "r") as f:
-    mock_data = json.load(f)
-
-# Insert mock data into the database
-insert_mock_data(db, mock_data)
-
-db.commit()
-
-
-# Override the get_db dependency in your app
-def override_get_db():
-    try:
-        yield db
-    finally:
-        db.remove()
-
-
-app.dependency_overrides[get_db] = override_get_db
-
-# Create a TestClient
-client = TestClient(app)
-
-
-def test_create_message_node_allowed():
-    new_message_node_data = {
-        "status": MessageStatuses.PENDING,
-        "text": "Test message node",
-        "parent_node_id": 2,
-        # "parent_condition_edge_id": 0,
-        "workflow_id": 1,
-    }
-
-    # db.query(models.MessageNode).get.return_value = mock_data_existing
-
-    response = client.post("/message_nodes/", json=new_message_node_data)
-    # assert response.status_code == 200
-    assert response.json()["detail"] == "hhllllll"
 
 
 #
