@@ -84,27 +84,112 @@ def create_message_node_endpoint(
     response_model=schemas.MessageNodeCreate,
 )
 def update_message_node_endpoint(
-    node_id: int, node: schemas.MessageNodeCreate, db: CommonDB
+    message_node_id: int, message_node: schemas.MessageNodeCreate, db: CommonDB
 ):
-    parent_node = db.query(models.Node).get(node.parent_node_id)
+    parent_node = db.query(models.Node).get(message_node.parent_node_id)
 
-    if node.parent_node_id != 0 and not parent_node:
+    existing_message_node = (
+        db.query(models.MessageNode)
+        .filter(
+            models.MessageNode.parent_node_id == message_node.parent_node_id,
+            models.MessageNode.workflow_id == message_node.workflow_id,
+        )
+        .first()
+    )
+
+    if message_node.parent_node_id != 0 and not parent_node:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Parent node with id {node.parent_node_id} not found",
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Parent node with id {message_node.parent_node_id} not found",
         )
 
+    if parent_node:
+        if (
+            parent_node.workflow_id != 0
+            and message_node.parent_node_id != 0
+            and message_node.workflow_id != parent_node.workflow_id
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Parent node is from different workflow: {parent_node.workflow_id}.",
+            )
+
+        if parent_node.node_type == NodeTypes.START and existing_message_node:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Another message node is already assigned to this start node.",
+            )
+
     db_node = crud_message.update_message_node(
-        db=db, node_id=node_id, new_node=node
+        db=db, node_id=message_node_id, new_node=message_node
     )
 
     if db_node is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Node with id {node_id} not found",
+            detail=f"Node with id {message_node_id} not found",
         )
 
     return db_node
+
+
+#
+# @router.put(
+#     "/message_nodes/{message_node_id}",
+#     response_model=schemas.MessageNodeCreate,
+# )
+# def update_message_node_endpoint(
+#     message_node_id: int, node: schemas.MessageNodeCreate, db: CommonDB
+# ):
+#     parent_node = db.query(models.Node).get(node.parent_node_id)
+#     message_node = crud_message.get_message_node_detail(
+#         db=db, node_id=message_node_id
+#     )
+#
+#     if parent_node:
+#         if (
+#             parent_node.workflow_id != 0
+#             and node.parent_node_id != 0
+#             and node.workflow_id != parent_node.workflow_id
+#         ):
+#             raise HTTPException(
+#                 status_code=status.HTTP_403_FORBIDDEN,
+#                 detail=f"Parent node is from different workflow: {parent_node.workflow_id}.",
+#             )
+#
+#         if parent_node.node_type == NodeTypes.START:
+#             existing_message_node = (
+#                 db.query(models.MessageNode)
+#                 .filter(
+#                     models.MessageNode.parent_node_id == node.parent_node_id,
+#                     models.MessageNode.workflow_id == node.workflow_id,
+#                 )
+#                 .first()
+#             )
+#             if existing_message_node:
+#                 raise HTTPException(
+#                     status_code=status.HTTP_403_FORBIDDEN,
+#                     detail="Another message node is already assigned to this start node.",
+#                 )
+#
+#     if node.parent_node_id != 0 and not parent_node:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail=f"Parent node with id {node.parent_node_id} not found",
+#         )
+#
+#     db_node = crud_message.update_message_node(
+#         db=db, node_id=message_node_id, new_node=node
+#     )
+#
+#     if db_node is None:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail=f"Node with id {message_node_id} not found",
+#         )
+#
+#     return db_node
+#
 
 
 @router.delete(
