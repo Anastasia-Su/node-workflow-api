@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
 from dependencies import CommonDB
 from nodes import models, schemas
@@ -14,11 +14,17 @@ router = APIRouter()
 
 @router.get("/message_nodes/", response_model=list[schemas.MessageNode])
 def read_message_nodes(
-    db: CommonDB, text: str | None, status: MessageStatuses | None
+    db: CommonDB,
+    text: str | None = Query(None, description="Filter by piece of text"),
+    status: MessageStatuses | None = Query(
+        None, description="Filter by status"
+    ),
 ) -> list[models.MessageNode]:
     """Endpoint for retrieving all message nodes with filter options"""
 
-    return crud_message.get_message_node_list(db=db, text=text, status=status)
+    return crud_message.get_message_node_list(
+        db=db, text=text, message_status=status
+    )
 
 
 @router.get(
@@ -57,8 +63,9 @@ def create_message_node_endpoint(
 def update_message_node_endpoint(
     message_node_id: int, message_node: schemas.MessageNodeCreate, db: CommonDB
 ) -> models.MessageNode:
-    exceptions_for_message_router_403(message_node=message_node, db=db)
     """Endpoint for updating a messages node"""
+
+    exceptions_for_message_router_403(message_node=message_node, db=db)
 
     db_node = crud_message.update_message_node(
         db=db, node_id=message_node_id, new_node=message_node

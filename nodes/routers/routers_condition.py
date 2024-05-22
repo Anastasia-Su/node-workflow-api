@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
 from dependencies import CommonDB
 from nodes import models, schemas
@@ -15,9 +15,20 @@ router = APIRouter()
 @router.get("/condition_nodes/", response_model=list[schemas.ConditionNode])
 def read_condition_nodes(
     db: CommonDB,
+    parent_message_node_id: int | None = Query(
+        None, description="Filter by parent_message_node_id"
+    ),
+    condition: str | None = Query(
+        None, description="Filter by piece of condition"
+    ),
 ) -> list[models.ConditionNode]:
+    """Endpoint for retrieving all condition nodes with filter options"""
 
-    return crud_condition.get_condition_node_list(db=db)
+    return crud_condition.get_condition_node_list(
+        db=db,
+        parent_message_node_id=parent_message_node_id,
+        condition=condition,
+    )
 
 
 @router.get(
@@ -27,6 +38,8 @@ def read_condition_nodes(
 def read_single_condition_node(
     condition_node_id: int, db: CommonDB
 ) -> models.ConditionNode:
+    """Endpoint for retrieving a single condition node"""
+
     db_condition_node = crud_condition.get_condition_node_detail(
         db=db, node_id=condition_node_id
     )
@@ -43,24 +56,7 @@ def create_condition_node_endpoint(
     condition_node: schemas.ConditionNodeCreate,
     db: CommonDB,
 ) -> models.ConditionNode:
-
-    # parent_node = db.query(models.Node).get(condition_node.parent_node_id)
-
-    # parent_message_node = db.query(models.Node).get(
-    #     condition_node.parent_message_node_id
-    # )
-
-    # if not parent_node:
-    #     raise HTTPException(
-    #         status_code=404,
-    #         detail=f"Parent node with id {condition_node.parent_node_id} not found",
-    #     )
-
-    # if not parent_message_node:
-    #     raise HTTPException(
-    #         status_code=404,
-    #         detail=f"Parent message node with id {condition_node.parent_message_node_id} not found",
-    #     )
+    """Endpoint for creating a condition node"""
 
     exceptions_for_condition_router_403(condition_node=condition_node, db=db)
 
@@ -90,35 +86,19 @@ def create_condition_node_endpoint(
     response_model=schemas.ConditionNodeCreate,
 )
 def update_condition_node_endpoint(
-    condition_node_id: int,
+    node_id: int,
     condition_node: schemas.ConditionNodeCreate,
     db: CommonDB,
 ) -> models.ConditionNode:
-    # parent_node = db.query(models.Node).get(condition_node.parent_node_id)
-    # parent_message_node = db.query(models.Node).get(
-    #     condition_node.parent_message_node_id
-    # )
-    #
-    # if not parent_node:
-    #     raise HTTPException(
-    #         status_code=404,
-    #         detail=f"Parent node with id {condition_node.parent_node_id} not found",
-    #     )
-    #
-    # if not parent_message_node:
-    #     raise HTTPException(
-    #         status_code=404,
-    #         detail=f"Parent message node with id {condition_node.parent_message_node_id} not found",
-    #     )
+    """Endpoint for updating a condition node"""
+
     exceptions_for_condition_router_403(condition_node=condition_node, db=db)
 
     db_condition_node = crud_condition.update_condition_node(
-        db=db, node_id=condition_node_id, new_node=condition_node
+        db=db, node_id=node_id, new_node=condition_node
     )
 
-    exceptions_for_router_404(
-        db_node=db_condition_node, node_id=condition_node_id
-    )
+    exceptions_for_router_404(db_node=db_condition_node, node_id=node_id)
 
     return db_condition_node
 
@@ -128,9 +108,10 @@ def update_condition_node_endpoint(
     response_model=schemas.ConditionNode,
 )
 def delete_condition_node(node_id: int, db: CommonDB) -> models.ConditionNode:
+    """Endpoint for deleting a condition node"""
+
     db_node = crud_condition.delete_condition_node(db=db, node_id=node_id)
+
     exceptions_for_router_404(db_node=db_node, node_id=node_id)
-    # if db_node is None:
-    #     raise HTTPException(status_code=404, detail="Node not found")
 
     return db_node
