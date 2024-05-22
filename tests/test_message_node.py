@@ -59,14 +59,14 @@ def test_create_message_node_allowed():
         "text": "Test message node",
         "parent_node_id": 2,
         # "parent_condition_edge_id": 0,
-        "workflow_id": 1,
+        "workflow_id": 2,
     }
 
     # db.query(models.MessageNode).get.return_value = mock_data_existing
 
     response = client.post("/message_nodes/", json=new_message_node_data)
-    # assert response.status_code == 200
-    assert response.json()["detail"] == "hhllllll"
+    assert response.status_code == 200
+    # assert response.json()["detail"] == "hhllllll"
 
 
 #

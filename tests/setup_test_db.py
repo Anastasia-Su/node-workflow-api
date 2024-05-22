@@ -22,14 +22,31 @@ logger = logging.getLogger(__name__)
 
 def setup_test_db():
     # Create an in-memory SQLite database engine
-    SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+    # SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+    # engine = create_engine(
+    #     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    # )
+    # SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    # db = scoped_session(SessionLocal)
+
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(BASE_DIR, "test_database.sqlite")
+
+    # Update the SQLAlchemy database URL to use the file-based SQLite database
+    SQLALCHEMY_DATABASE_URL = f"sqlite:///{db_path}"
+
+    # Create the SQLAlchemy engine with the updated URL
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
     )
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    db = scoped_session(SessionLocal)
 
-    # Create all tables
+    # # Create a configured "Session" class
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    #
+    # # Create a scoped session
+    db = scoped_session(SessionLocal)
+    #
+    # # Create all tables
     Base.metadata.create_all(bind=engine)
 
     current_dir = os.path.dirname(__file__)
@@ -116,5 +133,5 @@ def setup_test_db():
             )
             db.add(c_edge)
 
-    db.commit()
+    # db.commit()
     return db

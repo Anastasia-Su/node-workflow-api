@@ -34,33 +34,34 @@ def wrong_parent_exception(
         )
 
 
-def existing_message_exception(
-    message_node: schemas.MessageNodeCreate,
-    db: CommonDB,
-    parent_node: (
-        schemas.MessageNode | schemas.StartNode | schemas.ConditionNode
-    ),
-) -> None:
-    """Raise an exception if another message is already assigned to specified start node"""
-
-    existing_message_node = (
-        db.query(models.MessageNode)
-        .filter(
-            models.MessageNode.parent_node_id == message_node.parent_node_id,
-            models.MessageNode.workflow_id == message_node.workflow_id,
-        )
-        .first()
-    )
-
-    if (
-        parent_node
-        and parent_node.node_type == NodeTypes.START
-        and existing_message_node
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Another message node is already assigned to this start node.",
-        )
+#
+# def existing_message_exception(
+#     message_node: schemas.MessageNodeCreate,
+#     db: CommonDB,
+#     parent_node: (
+#         schemas.MessageNode | schemas.StartNode | schemas.ConditionNode
+#     ),
+# ) -> None:
+#     """Raise an exception if another message is already assigned to specified start node"""
+#
+#     existing_message_node = (
+#         db.query(models.MessageNode)
+#         .filter(
+#             models.MessageNode.parent_node_id == message_node.parent_node_id,
+#             models.MessageNode.workflow_id == message_node.workflow_id,
+#         )
+#         .first()
+#     )
+#
+#     if (
+#         parent_node
+#         and parent_node.node_type == NodeTypes.START
+#         and existing_message_node
+#     ):
+#         raise HTTPException(
+#             status_code=status.HTTP_403_FORBIDDEN,
+#             detail="Another message node is already assigned to this start node.",
+#         )
 
 
 def existing_child_exception(
@@ -97,7 +98,8 @@ def existing_child_exception(
             if existing_message_child and node.parent_node_id != 0:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f"Parent node with id {node.parent_node_id} already has a child node with id {existing_message_child.id}.",
+                    detail=f"Parent node with id {node.parent_node_id} already has a child node with id "
+                    f"{existing_message_child.id}.",
                 )
 
 
@@ -122,6 +124,21 @@ def workflow_not_found_exception(
         )
 
 
+def exception_for_wrong_ref_id(
+    parent_node: (
+        schemas.MessageNode | schemas.StartNode | schemas.ConditionNode
+    ),
+    parent_node_id: int,
+) -> None:
+    """Raise an exception when a parent or reference node not found."""
+
+    if parent_node_id != 0 and parent_node is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Parent node with id {parent_node_id} not found",
+        )
+
+
 def exceptions_for_router_403(
     node: (
         schemas.MessageNodeCreate
@@ -141,11 +158,9 @@ def exceptions_for_router_403(
 
     workflow_not_found_exception(node=node, db=db)
 
-    if parent_node_id != 0 and parent_node is None:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Parent node with id {parent_node_id} not found",
-        )
+    exception_for_wrong_ref_id(
+        parent_node=parent_node, parent_node_id=parent_node_id
+    )
 
     if parent_node:
         if (
@@ -215,12 +230,39 @@ def exceptions_for_condition_router_403(
     )
 
 
+def exceptions_for_condition_edge_router_403(
+    edge: schemas.ConditionEdgeCreate, db: CommonDB
+) -> None:
+    """Raise an exception if specified edge already exists
+    or reference condition does not exist"""
+
+    reference_node = db.query(models.Node).get(edge.condition_node_id)
+
+    exception_for_wrong_ref_id(
+        parent_node=reference_node, parent_node_id=edge.condition_node_id
+    )
+
+    existing_edge = (
+        db.query(models.ConditionEdge)
+        .filter(
+            models.ConditionEdge.condition_node_id == edge.condition_node_id,
+            models.ConditionEdge.edge == edge.edge,
+        )
+        .first()
+    )
+
+    if existing_edge and edge.condition_node_id != 0:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail="Edge with these data already exists.",
+        )
+
+
 def exceptions_for_message_router_403(
     message_node: schemas.MessageNodeCreate, db: CommonDB
 ) -> None:
     """Combine exceptions from the functions:
     exceptions_for_router_403,
-    existing_message_exception,
     wrong_parent_exception,
     existing_child_exception"""
 
@@ -281,5 +323,5 @@ def exceptions_for_router_404(db_node, node_id) -> None:
     if db_node is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Node with id {node_id} not found",
+            detail=f"Object with id {node_id} not found",
         )
