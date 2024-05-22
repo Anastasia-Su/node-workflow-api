@@ -10,7 +10,7 @@ def get_message_node_list(
     text: str | None = None,
     message_status: MessageStatuses | None = None,
 ) -> list[type(models.MessageNode)]:
-    """Retrieve all message nodes with the option to filter by text and status."""
+    """Retrieve all message nodes with the option to filter by text and status"""
 
     message_nodes = db.query(models.MessageNode)
 
@@ -27,7 +27,7 @@ def get_message_node_list(
 
 
 def get_message_node_detail(db: Session, node_id: int) -> models.MessageNode:
-    """Retrieve a message node with the given id."""
+    """Retrieve a message node with the given id"""
 
     return db.query(models.MessageNode).get(node_id)
 
@@ -35,7 +35,7 @@ def get_message_node_detail(db: Session, node_id: int) -> models.MessageNode:
 def create_message_node(
     db: Session, node: schemas.MessageNodeCreate
 ) -> models.MessageNode:
-    """Create a new message node."""
+    """Create a new message node"""
 
     db_node = models.MessageNode(
         status=node.status,
@@ -54,7 +54,7 @@ def create_message_node(
 def update_message_node(
     db: Session, node_id: int, new_node: schemas.MessageNodeCreate
 ) -> type(models.MessageNode):
-    """Update a message node with the given id."""
+    """Update a message node with the given id"""
 
     node = db.get(models.MessageNode, node_id)
 
@@ -72,7 +72,7 @@ def update_message_node(
 
 
 def delete_message_node(db: Session, node_id: int) -> type(models.MessageNode):
-    """Delete a message node with the given id."""
+    """Delete a message node with the given id"""
 
     node = db.get(models.MessageNode, node_id)
     if node:

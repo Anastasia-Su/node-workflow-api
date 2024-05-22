@@ -8,7 +8,7 @@ def get_condition_node_list(
     parent_message_node_id: int | None = None,
     condition: str | None = None,
 ) -> list[type(models.ConditionNode)]:
-    """Retrieve all condition nodes with the option to filter by parent_message_id and condition."""
+    """Retrieve all condition nodes with the option to filter by parent_message_id and condition"""
 
     condition_nodes = db.query(models.ConditionNode)
 
@@ -31,7 +31,7 @@ def get_condition_node_list(
 def get_condition_node_detail(
     db: Session, node_id: int
 ) -> models.ConditionNode:
-    """Retrieve a condition node with the given id."""
+    """Retrieve a condition node with the given id"""
 
     return db.query(models.ConditionNode).get(node_id)
 
@@ -39,7 +39,7 @@ def get_condition_node_detail(
 def create_condition_node(
     db: Session, node: schemas.ConditionNodeCreate
 ) -> models.ConditionNode:
-    """Create a new condition node."""
+    """Create a new condition node"""
 
     db_node = models.ConditionNode(
         condition=node.condition,
@@ -57,7 +57,7 @@ def create_condition_node(
 def update_condition_node(
     db: Session, node_id: int, new_node: schemas.ConditionNodeCreate
 ) -> type(models.ConditionNode):
-    """Update a condition node with the given id."""
+    """Update a condition node with the given id"""
 
     node = db.get(models.ConditionNode, node_id)
 
@@ -76,7 +76,7 @@ def update_condition_node(
 def delete_condition_node(
     db: Session, node_id: int
 ) -> type(models.ConditionNode):
-    """Delete a condition node."""
+    """Delete a condition node"""
 
     node = db.get(models.ConditionNode, node_id)
 

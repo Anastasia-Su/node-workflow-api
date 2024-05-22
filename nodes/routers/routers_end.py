@@ -1,8 +1,12 @@
-from fastapi import HTTPException, APIRouter
+from fastapi import APIRouter
 
 from dependencies import CommonDB
 from nodes import models, schemas
 from nodes.crud import crud_end
+from nodes.routers.utils_for_routers import (
+    exceptions_for_router_404,
+    exceptions_for_end_router_403,
+)
 
 router = APIRouter()
 
@@ -11,18 +15,20 @@ router = APIRouter()
 def read_end_nodes(
     db: CommonDB,
 ) -> list[models.EndNode]:
+    """Endpoint for retrieving all end nodes"""
 
     return crud_end.get_end_node_list(db=db)
 
 
 @router.get("/end_nodes/{end_node_id}/", response_model=schemas.EndNode)
 def read_single_end_node(end_node_id: int, db: CommonDB) -> models.EndNode:
-    db_end_node = crud_end.get_end_node_detail(db=db, node_id=end_node_id)
+    """Endpoint for retrieving a single end node"""
 
-    if db_end_node is None:
-        raise HTTPException(status_code=404, detail="Node not found")
+    db_node = crud_end.get_end_node_detail(db=db, node_id=end_node_id)
 
-    return db_end_node
+    exceptions_for_router_404(db_node=db_node, node_id=end_node_id)
+
+    return db_node
 
 
 @router.post("/end_nodes/", response_model=schemas.EndNodeCreate)
@@ -30,14 +36,9 @@ def create_end_node_endpoint(
     end_node: schemas.EndNodeCreate,
     db: CommonDB,
 ) -> models.EndNode:
+    """Endpoint for creating an end node"""
 
-    parent_message_node = db.query(models.Node).get(end_node.parent_node_id)
-
-    if not parent_message_node:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Parent message node with id {end_node.parent_node_id} not found",
-        )
+    exceptions_for_end_router_403(end_node=end_node, db=db)
 
     return crud_end.create_end_node(db=db, node=end_node)
 
@@ -48,14 +49,10 @@ def create_end_node_endpoint(
 )
 def update_end_node_endpoint(
     node_id: int, node: schemas.EndNodeCreate, db: CommonDB
-):
-    parent_message_node = db.query(models.Node).get(node.parent_node_id)
+) -> models.EndNode:
+    """Endpoint for updating an end node"""
 
-    if not parent_message_node:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Parent message node with id {node.parent_node_id} not found",
-        )
+    exceptions_for_end_router_403(end_node=node, db=db)
 
     db_node = crud_end.update_end_node(
         db=db,
@@ -63,16 +60,17 @@ def update_end_node_endpoint(
         new_node=node,
     )
 
-    if db_node is None:
-        raise HTTPException(status_code=404, detail="Node not found")
+    exceptions_for_router_404(db_node=db_node, node_id=node_id)
 
     return db_node
 
 
 @router.delete("/end_nodes/{end_node_id}", response_model=schemas.EndNode)
-def delete_end_node(node_id: int, db: CommonDB):
+def delete_end_node(node_id: int, db: CommonDB) -> models.EndNode:
+    """Endpoint for deleting an end node"""
+
     db_node = crud_end.delete_end_node(db=db, node_id=node_id)
-    if db_node is None:
-        raise HTTPException(status_code=404, detail="Node not found")
+
+    exceptions_for_router_404(db_node=db_node, node_id=node_id)
 
     return db_node
