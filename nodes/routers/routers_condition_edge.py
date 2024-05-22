@@ -32,28 +32,6 @@ def read_single_condition_edge(
     return db_condition_edge
 
 
-#
-# @router.post("/condition_edges/", response_model=schemas.ConditionEdgeCreate)
-# def create_condition_edge_endpoint(
-#     condition_edge: schemas.ConditionEdgeCreate,
-#     db: CommonDB,
-# ) -> models.ConditionEdge:
-#
-#     condition_node = crud_condition_edge.get_condition_edge_detail(
-#         db=db, edge_id=condition_edge.id
-#     )
-#
-#     if not condition_node:
-#         raise HTTPException(
-#             status_code=404,
-#             detail=f"Edge with id {condition_edge.condition_node_id} not found",
-#         )
-#
-#     return crud_condition_edge.create_condition_edge(
-#         db=db, edge=condition_edge
-#     )
-
-
 @router.put(
     "/condition_edges/{condition_edge_id}",
     response_model=schemas.ConditionEdgeCreate,
