@@ -268,7 +268,9 @@ def exceptions_for_condition_edge_router_403(
 
 
 def exceptions_for_message_router_403(
-    message_node: schemas.MessageNodeCreate, db: CommonDB
+    message_node: schemas.MessageNodeCreate,
+    db: CommonDB,
+    node_id: int | None = None,
 ) -> None:
     """Combine exceptions from the functions:
     exceptions_for_router_403,
@@ -282,9 +284,7 @@ def exceptions_for_message_router_403(
     )
 
     existing_child_exception(
-        node=message_node,
-        parent_node=parent_node,
-        db=db,
+        node=message_node, parent_node=parent_node, db=db, node_id=node_id
     )
 
     exceptions_for_router_403(

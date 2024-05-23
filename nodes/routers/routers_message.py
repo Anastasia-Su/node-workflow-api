@@ -65,7 +65,9 @@ def update_message_node_endpoint(
 ) -> models.MessageNode:
     """Endpoint for updating a messages node"""
 
-    exceptions_for_message_router_403(message_node=message_node, db=db)
+    exceptions_for_message_router_403(
+        message_node=message_node, db=db, node_id=message_node_id
+    )
 
     db_node = crud_message.update_message_node(
         db=db, node_id=message_node_id, new_node=message_node
