@@ -15,13 +15,18 @@ def build_graph(G: nx.DiGraph) -> None:
     labels = {}
     colors = []
     for node, data in G.nodes(data=True):
-        labels[node] = f"{data['label']}\nID: {node}"
+        label_parts = [f"ID: {node}", data["label"]]
+
         if "message" in data:
-            labels[node] += f"\nMessage: {data['message']}"
+            label_parts.append(f"Message: {data['message']}")
         if "status" in data:
-            labels[node] += f"\nStatus: {data['status']}\nText: {data['text']}"
+            label_parts.append(f"Status: {data['status']}")
+            label_parts.append(f"Text: {data['text']}")
+
         if "condition" in data:
-            labels[node] += f"\nCondition: {data['condition']}"
+            label_parts.append(f"Condition: {data['condition']}")
+
+        labels[node] = "\n".join(label_parts)
 
         colors.append(node_color_map[data["label"]])
 
@@ -39,6 +44,7 @@ def build_graph(G: nx.DiGraph) -> None:
     for node, (x, y) in pos.items():
         text = labels[node]
         wrapped_text = "\n".join(textwrap.wrap(text, width=15))
+        print(f"Node: {node}, Wrapped Text: {wrapped_text}")
         plt.text(
             x,
             y,
@@ -56,6 +62,6 @@ def build_graph(G: nx.DiGraph) -> None:
 
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=14)
 
-    # plt.show()
-    plt.savefig("workflow_graph.png", bbox_inches="tight")
+    plt.show()
+    # plt.savefig("workflow_graph.png", bbox_inches="tight")
     plt.close()

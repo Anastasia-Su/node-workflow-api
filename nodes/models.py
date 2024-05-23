@@ -12,6 +12,12 @@ class MessageStatuses(StrEnum):
     OPEN = auto()
 
 
+class EnumConditions(StrEnum):
+    SENT_CONDITION = f"status == {MessageStatuses.SENT.value}"
+    OPEN_CONDITION = f"status == {MessageStatuses.OPEN.value}"
+    PENDING_CONDITION = f"status == {MessageStatuses.PENDING.value}"
+
+
 class NodeTypes(StrEnum):
     START = auto()
     MESSAGE = auto()
@@ -91,6 +97,7 @@ class ConditionNode(Node):
 
     id = Column(Integer, ForeignKey("node.id"), primary_key=True)
     condition = Column(String, nullable=False)
+    # condition = Column(Enum(EnumConditions).values_callable, nullable=False)
 
     parent_node_id = Column(Integer, ForeignKey("node.id"), nullable=True)
     parent_message_node_id = Column(

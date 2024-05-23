@@ -2,18 +2,31 @@ import logging
 import time
 import networkx as nx
 from fastapi import HTTPException
+from networkx import DiGraph
 
 from dependencies import CommonDB
 from nodes import models, crud
-from nodes.crud import crud_workflow, crud_message, crud_condition_edge
-from nodes.models import ConditionEdges, ConditionEdge
+from nodes.crud import (
+    crud_workflow,
+    crud_message,
+    crud_condition_edge,
+    crud_condition,
+)
+from nodes.models import (
+    ConditionEdges,
+    ConditionEdge,
+    EnumConditions,
+    MessageStatuses,
+)
 from utils.graph import build_graph
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-def execute_workflow(db: CommonDB, workflow_id: int):
+def execute_workflow(
+    db: CommonDB, workflow_id: int
+) -> dict[str, DiGraph | float]:
     workflow_node = crud_workflow.get_workflow_detail(
         db=db, node_id=workflow_id
     )
@@ -113,6 +126,17 @@ def execute_workflow(db: CommonDB, workflow_id: int):
                     ),
                     None,
                 )
+
+            if not next_node:
+                next_node = next(
+                    (
+                        node
+                        for node in message_nodes
+                        if node.parent_node_id == current_node.id
+                    ),
+                    None,
+                )
+
             if not next_node:
                 raise HTTPException(
                     status_code=404,
@@ -141,6 +165,8 @@ def execute_workflow(db: CommonDB, workflow_id: int):
 
             if parent_message_node:
                 if (
+                    # parent_message_node.status.lower()
+                    # not in current_node.condition.lower()
                     current_node.condition.split(" ")[-1].lower()
                     == parent_message_node.status.lower()
                 ):

@@ -74,6 +74,7 @@ def existing_child_exception(
         schemas.MessageNode | schemas.StartNode | schemas.ConditionNode
     ),
     db: CommonDB,
+    node_id: int | None = None,
 ) -> None:
     """Raise an exception if parent message node already has a child node"""
 
@@ -95,7 +96,11 @@ def existing_child_exception(
                 .first()
             )
 
-            if existing_message_child and node.parent_node_id != 0:
+            if (
+                existing_message_child
+                and node.parent_node_id != 0
+                and existing_message_child.id != node_id
+            ):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail=f"Parent node with id {node.parent_node_id} already has a child node with id "
@@ -165,18 +170,21 @@ def exceptions_for_router_403(
     if parent_node:
         if (
             parent_node.workflow_id != 0
+            and node.workflow_id != 0
             and parent_node_id != 0
             and node.workflow_id != parent_node.workflow_id
         ):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Parent {parent_node.node_type.upper()} node is from different workflow: {parent_node.workflow_id}.",
+                detail=f"Parent {parent_node.node_type.upper()} node "
+                f"is from different workflow: {parent_node.workflow_id}.",
             )
 
 
 def exceptions_for_condition_router_403(
     condition_node: schemas.ConditionNodeCreate,
     db: CommonDB,
+    node_id: int | None = None,
 ) -> None:
     """Combine exceptions from the functions:
     exceptions_for_router_403,
@@ -211,6 +219,7 @@ def exceptions_for_condition_router_403(
         )
 
     existing_child_exception(
+        node_id=node_id,
         node=condition_node,
         parent_node=parent_node,
         db=db,
@@ -253,7 +262,7 @@ def exceptions_for_condition_edge_router_403(
 
     if existing_edge and edge.condition_node_id != 0:
         raise HTTPException(
-            status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Edge with these data already exists.",
         )
 

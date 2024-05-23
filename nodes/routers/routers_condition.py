@@ -92,7 +92,9 @@ def update_condition_node_endpoint(
 ) -> models.ConditionNode:
     """Endpoint for updating a condition node"""
 
-    exceptions_for_condition_router_403(condition_node=condition_node, db=db)
+    exceptions_for_condition_router_403(
+        condition_node=condition_node, db=db, node_id=node_id
+    )
 
     db_condition_node = crud_condition.update_condition_node(
         db=db, node_id=node_id, new_node=condition_node

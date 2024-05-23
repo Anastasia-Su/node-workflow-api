@@ -1,9 +1,10 @@
 import networkx as nx
 
-from utils.utils import execute_workflow
+from nodes.routers.utils_for_routers import exceptions_for_router_404
+from utils.utils_for_execute_router import execute_workflow
 
 
-from fastapi import HTTPException, APIRouter
+from fastapi import HTTPException, APIRouter, status
 from fastapi.responses import JSONResponse
 
 from dependencies import CommonDB
@@ -17,6 +18,7 @@ router = APIRouter()
 def read_workflows(
     db: CommonDB,
 ) -> list[models.Workflow]:
+    """Endpoint for retrieving all workflows"""
 
     return crud_workflow.get_workflow_list(db=db)
 
@@ -26,14 +28,12 @@ def read_workflows(
     response_model=schemas.Workflow,
 )
 def read_single_workflow(workflow_id: int, db: CommonDB) -> schemas.Workflow:
-    db_workflow_node = crud_workflow.get_workflow_detail(
-        db=db, node_id=workflow_id
-    )
+    """Endpoint for retrieving a single workflow"""
 
-    if db_workflow_node is None:
-        raise HTTPException(status_code=404, detail="Workflow not found")
+    db_workflow = crud_workflow.get_workflow_detail(db=db, node_id=workflow_id)
+    exceptions_for_router_404(db_node=db_workflow, node_id=workflow_id)
 
-    return db_workflow_node
+    return db_workflow
 
 
 @router.post("/workflows/", response_model=schemas.WorkflowCreate)
@@ -41,6 +41,7 @@ def create_workflow_endpoint(
     workflow: schemas.WorkflowCreate,
     db: CommonDB,
 ) -> models.Workflow:
+    """Endpoint for creating a workflow"""
 
     return crud_workflow.create_workflow(db=db, node=workflow)
 
@@ -50,37 +51,39 @@ def create_workflow_endpoint(
     response_model=schemas.WorkflowCreate,
 )
 def update_workflow_endpoint(
-    node_id: int, node: schemas.WorkflowCreate, db: CommonDB
-):
-    db_node = crud_workflow.update_workflow(
-        db=db, node_id=node_id, new_node=node
+    workflow_id: int, workflow: schemas.WorkflowCreate, db: CommonDB
+) -> models.Workflow:
+    """Endpoint for updating a workflow"""
+
+    db_workflow = crud_workflow.update_workflow(
+        db=db, node_id=workflow_id, new_node=workflow
     )
 
-    if db_node is None:
-        raise HTTPException(
-            status_code=404, detail=f"Workflow with id {node_id} not found"
-        )
+    exceptions_for_router_404(db_node=db_workflow, node_id=workflow_id)
 
-    return db_node
+    return db_workflow
 
 
 @router.delete(
     "/workflows/{workflow_id}",
     response_model=schemas.Workflow,
 )
-def delete_workflow(node_id: int, db: CommonDB):
-    db_node = crud_workflow.delete_workflow(db=db, node_id=node_id)
-    if db_node is None:
-        raise HTTPException(status_code=404, detail="Workflow not found")
+def delete_workflow(workflow_id: int, db: CommonDB) -> models.Workflow:
+    """Endpoint for deleting a workflow"""
 
-    return db_node
+    db_workflow = crud_workflow.delete_workflow(db=db, node_id=workflow_id)
+
+    exceptions_for_router_404(db_node=db_workflow, node_id=workflow_id)
+
+    return db_workflow
 
 
 @router.post("/workflows/execute")
-def run_workflow(db: CommonDB, workflow_id: int):
-    db_workflow_node = crud_workflow.get_workflow_detail(
-        db=db, node_id=workflow_id
-    )
+def run_workflow(db: CommonDB, workflow_id: int) -> JSONResponse:
+    """Endpoint for executing a workflow"""
+
+    db_workflow = crud_workflow.get_workflow_detail(db=db, node_id=workflow_id)
+    exceptions_for_router_404(db_node=db_workflow, node_id=workflow_id)
 
     try:
         result = execute_workflow(db, workflow_id)
@@ -90,5 +93,8 @@ def run_workflow(db: CommonDB, workflow_id: int):
             "graph": nx.node_link_data(result["graph"]),
         }
         return JSONResponse(content=response)
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        )
