@@ -48,6 +48,8 @@ class ConditionEdge(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     condition_node_id = Column(Integer, ForeignKey("condition.id"))
     edge = Column(Enum(ConditionEdges))
+    # TODO: add it and test
+    # condition_node = relationship("ConditionNode", back_populates="edge")
 
 
 class StartNode(Node):
@@ -103,6 +105,9 @@ class ConditionNode(Node):
     parent_message_node_id = Column(
         Integer, ForeignKey("message.id"), nullable=True
     )
+
+    # TODO: Try to implement it and test
+    # edge = relationship("ConditionEdge", uselist=False, back_populates="condition_node", cascade="all, delete-orphan")
     edge = relationship("ConditionEdge", uselist=False, backref="condition")
 
     workflow_id = Column(Integer, ForeignKey("workflow.id"), nullable=True)

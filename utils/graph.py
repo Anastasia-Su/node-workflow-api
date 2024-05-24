@@ -44,7 +44,7 @@ def build_graph(G: nx.DiGraph) -> None:
     for node, (x, y) in pos.items():
         text = labels[node]
         wrapped_text = "\n".join(textwrap.wrap(text, width=15))
-        print(f"Node: {node}, Wrapped Text: {wrapped_text}")
+
         plt.text(
             x,
             y,
