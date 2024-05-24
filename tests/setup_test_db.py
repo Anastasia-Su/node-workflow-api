@@ -20,37 +20,10 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-def setup_test_db():
-    # Create an in-memory SQLite database engine
-    # SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
-    # engine = create_engine(
-    #     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-    # )
-    # SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    # db = scoped_session(SessionLocal)
-
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(BASE_DIR, "test_database.sqlite")
-
-    # Update the SQLAlchemy database URL to use the file-based SQLite database
-    SQLALCHEMY_DATABASE_URL = f"sqlite:///{db_path}"
-
-    # Create the SQLAlchemy engine with the updated URL
-    engine = create_engine(
-        SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-    )
-
-    # # Create a configured "Session" class
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    #
-    # # Create a scoped session
-    db = scoped_session(SessionLocal)
-    #
-    # # Create all tables
-    Base.metadata.create_all(bind=engine)
-
-    current_dir = os.path.dirname(__file__)
-    file_path = os.path.join(current_dir, "mock_db_for_tests.json")
+def setup_test_db(db):
+    # current_dir = os.path.dirname(__file__)
+    # file_path = os.path.join(current_dir, "mock_db.json")
+    file_path = "mock_db.json"
     with open(file_path, "r") as f:
         mock_data = json.load(f)
 
@@ -61,23 +34,6 @@ def setup_test_db():
         end_nodes = workflow_data.get("end_nodes", [])
         workflows = workflow_data.get("workflows", [])
         condition_edges = workflow_data.get("condition_edges", [])
-        nodes = workflow_data.get("nodes", [])
-
-        existing_nodes = db.query(Node).all()
-
-        # for node_data in nodes:
-        #     existing_node = db.query(Node).get(node_data["id"])
-        #     # if existing_node is None:
-        #     node = Node(
-        #         id=node_data["id"],
-        #         node_type=node_data["node_type"],
-        #     )
-        #     # if node not in existing_nodes:
-        #     if existing_node is None:
-        #         logger.debug(f"Adding node: {node_data['id']}")
-        #         db.add(node)
-        #     else:
-        #         logger.debug(f"Node already exists: {node_data['id']}")
 
         for start_node_data in start_nodes:
             start_node = StartNode(
@@ -133,5 +89,5 @@ def setup_test_db():
             )
             db.add(c_edge)
 
-    # db.commit()
+    db.commit()
     return db

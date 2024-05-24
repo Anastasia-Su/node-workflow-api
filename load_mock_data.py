@@ -7,19 +7,18 @@ from sqlalchemy.orm import sessionmaker
 from database import Base
 from nodes import models
 
+
 SQLALCHEMY_DATABASE_URL = "sqlite:///./node-workflow.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-def load_mock_data(filename: str):
-    with open(filename, "r") as f:
-        data = json.load(f)
-    return data
+def insert_mock_data(db, file_name):
+    with open(file_name, "r") as f:
+        mock_data = json.load(f)
 
-
-def insert_mock_data(db, data):
-    for workflow_data in data:
+    for workflow_data in mock_data:
         start_nodes = workflow_data.get("start_nodes", [])
         message_nodes = workflow_data.get("message_nodes", [])
         condition_nodes = workflow_data.get("condition_nodes", [])
@@ -90,12 +89,12 @@ def insert_mock_data(db, data):
 
 if __name__ == "__main__":
     filename = sys.argv[1]
-    data = load_mock_data(filename)
 
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
+
     try:
-        insert_mock_data(db, data)
+        insert_mock_data(db, "mock_db.json")
     finally:
         db.close()
     print("Mock data loaded successfully.")

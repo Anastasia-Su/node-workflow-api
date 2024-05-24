@@ -1,6 +1,7 @@
 from typing import Union
 
 from fastapi import HTTPException, status
+from sqlalchemy import or_, and_
 
 from dependencies import CommonDB
 from nodes import schemas, models
@@ -90,9 +91,14 @@ def existing_child_exception(
             existing_message_child = (
                 db.query(exception_model)
                 .filter(
-                    exception_model.parent_node_id == node.parent_node_id,
-                    parent_node.node_type == NodeTypes.MESSAGE,
-                    exception_model.workflow_id == node.workflow_id,
+                    and_(
+                        exception_model.parent_node_id == node.parent_node_id,
+                        exception_model.workflow_id == node.workflow_id,
+                        or_(
+                            parent_node.node_type == NodeTypes.MESSAGE,
+                            parent_node.node_type == NodeTypes.START,
+                        ),
+                    )
                 )
                 .first()
             )
@@ -219,13 +225,6 @@ def exceptions_for_condition_router_403(
             attribute=attribute,
         )
 
-    existing_child_exception(
-        node_id=node_id,
-        node=condition_node,
-        parent_node=parent_node,
-        db=db,
-    )
-
     exceptions_for_router_403(
         node=condition_node,
         parent_node=parent_node,
@@ -236,6 +235,13 @@ def exceptions_for_condition_router_403(
         node=condition_node,
         parent_node=parent_message_node,
         parent_node_id=condition_node.parent_message_node_id,
+        db=db,
+    )
+
+    existing_child_exception(
+        node_id=node_id,
+        node=condition_node,
+        parent_node=parent_node,
         db=db,
     )
 
@@ -284,15 +290,15 @@ def exceptions_for_message_router_403(
         parent_node=parent_node, node_type=NodeTypes.END, attribute="node"
     )
 
-    existing_child_exception(
-        node=message_node, parent_node=parent_node, db=db, node_id=node_id
-    )
-
     exceptions_for_router_403(
         node=message_node,
         parent_node=parent_node,
         parent_node_id=message_node.parent_node_id,
         db=db,
+    )
+
+    existing_child_exception(
+        node=message_node, parent_node=parent_node, db=db, node_id=node_id
     )
 
 

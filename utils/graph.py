@@ -30,7 +30,10 @@ def build_graph(G: nx.DiGraph) -> None:
 
         colors.append(node_color_map[data["label"]])
 
+    # If you prefer different layout, uncomment one of the following.
     pos = nx.spring_layout(G)
+    # pos = nx.kamada_kawai_layout(G)
+    # pos = nx.spectral_layout(G)
 
     nx.draw(
         G,
