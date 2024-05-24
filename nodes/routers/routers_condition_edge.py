@@ -1,11 +1,10 @@
-from fastapi import HTTPException, APIRouter
+from fastapi import APIRouter
 
 from dependencies import CommonDB
 from nodes import models, schemas
 from nodes.crud import crud_condition_edge
-from nodes.routers.utils_for_routers import (
+from nodes.routers.exceptions_for_routers.exceptions import (
     exceptions_for_router_404,
-    exception_for_wrong_ref_id,
     exceptions_for_condition_edge_router_403,
 )
 

@@ -1,6 +1,8 @@
 import networkx as nx
 
-from nodes.routers.utils_for_routers import exceptions_for_router_404
+from nodes.routers.exceptions_for_routers.exceptions import (
+    exceptions_for_router_404,
+)
 
 # from utils.utils_for_execute_router import execute_workflow
 

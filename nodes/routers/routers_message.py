@@ -4,7 +4,7 @@ from dependencies import CommonDB
 from nodes import models, schemas
 from nodes.crud import crud_message
 from nodes.models import MessageStatuses
-from nodes.routers.utils_for_routers import (
+from nodes.routers.exceptions_for_routers.exceptions import (
     exceptions_for_message_router_403,
     exceptions_for_router_404,
 )

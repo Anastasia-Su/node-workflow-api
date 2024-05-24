@@ -4,7 +4,7 @@ from dependencies import CommonDB
 from nodes import models, schemas
 from nodes.crud import crud_condition, crud_condition_edge
 from nodes.models import ConditionEdges
-from nodes.routers.utils_for_routers import (
+from nodes.routers.exceptions_for_routers.exceptions import (
     exceptions_for_router_404,
     exceptions_for_condition_router_403,
 )

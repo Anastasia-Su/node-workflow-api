@@ -1,58 +1,4 @@
 [
-  {
-   "nodes":
-    [
-      {
-       "id": 1,
-       "node_type": "START"
-     },
-      {
-          "id": 2,
-          "node_type": "START"
-      },
-      {
-          "id": 3,
-          "node_type": "MESSAGE"
-      },
-      {
-          "id": 4,
-          "node_type": "MESSAGE"
-      },
-      {
-          "id": 5,
-          "node_type": "MESSAGE"
-      },
-      {
-          "id": 6,
-          "node_type": "MESSAGE"
-      },
-      {
-          "id": 7,
-          "node_type": "MESSAGE"
-      },
-      {
-          "id": 8,
-          "node_type": "CONDITION"
-      },
-      {
-          "id": 9,
-          "node_type": "CONDITION"
-      },
-      {
-          "id": 10,
-          "node_type": "END"
-      },
-      {
-          "id": 11,
-          "node_type": "END"
-      },
-      {
-          "id": 12,
-          "node_type": "END"
-      }
-
-    ]
-  },
  {
    "start_nodes": [
      {
@@ -64,6 +10,11 @@
      "id": 2,
      "message": "Start workflow 2",
      "workflow_id": 2
+     },
+     {
+     "id": 13,
+     "message": "Start workflow 3",
+     "workflow_id": 3
      }
    ]
  },
@@ -81,10 +32,28 @@
        "id": 4,
        "status": "SENT",
        "text": "Sent status message node",
-       "parent_node_id": 1,
+       "parent_node_id": 2,
        "parent_condition_edge_id": null,
        "workflow_id": 2
      },
+     {
+       "id": 14,
+       "status": "OPEN",
+       "text": "Open status message node",
+       "parent_node_id": 4,
+       "parent_condition_edge_id": null,
+       "workflow_id": 2
+     },
+     {
+       "id": 17,
+       "status": "PENDING",
+       "text": "Pending status message node",
+       "parent_node_id": 16,
+       "parent_condition_edge_id": null,
+       "workflow_id": 2
+     },
+
+
      {
        "id": 5,
        "status": "PENDING",
@@ -126,6 +95,20 @@
        "parent_node_id": 8,
        "parent_message_node_id": 3,
        "workflow_id": 1
+     },
+     {
+       "id": 15,
+       "condition": "status == SENT",
+       "parent_node_id": 14,
+       "parent_message_node_id": 4,
+       "workflow_id": 2
+     },
+     {
+       "id": 16,
+       "condition": "status == OPEN",
+       "parent_node_id": 15,
+       "parent_message_node_id": 4,
+       "workflow_id": 2
      }
    ]
  },

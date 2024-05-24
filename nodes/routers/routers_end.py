@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from dependencies import CommonDB
 from nodes import models, schemas
 from nodes.crud import crud_end
-from nodes.routers.utils_for_routers import (
+from nodes.routers.exceptions_for_routers.exceptions import (
     exceptions_for_router_404,
     exceptions_for_end_router_403,
 )

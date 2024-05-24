@@ -1,15 +1,16 @@
 from typing import Union
-
 from fastapi import HTTPException, status
-from sqlalchemy import or_, and_
 
 from dependencies import CommonDB
 from nodes import schemas, models
 from nodes.models import NodeTypes
-
-import logging
-
-logger = logging.getLogger(__name__)
+from nodes.routers.exceptions_for_routers.building_blocks import (
+    workflow_not_found_exception,
+    exception_for_wrong_ref_id,
+    different_workflow_exception,
+    wrong_parent_exception,
+    existing_child_exception,
+)
 
 
 NodeTypeAlias = Union[
@@ -20,143 +21,8 @@ NodeTypeAlias = Union[
 ]
 
 
-def wrong_parent_exception(
-    parent_node: (
-        schemas.MessageNode | schemas.StartNode | schemas.ConditionNode
-    ),
-    node_type: NodeTypes,
-    attribute: str,
-) -> None:
-    """Raise an exception when a parent node is of wrong type."""
-
-    if parent_node and parent_node.node_type == node_type:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Parent {attribute} can't be of type {parent_node.node_type.upper()}",
-        )
-
-
-#
-# def existing_message_exception(
-#     message_node: schemas.MessageNodeCreate,
-#     db: CommonDB,
-#     parent_node: (
-#         schemas.MessageNode | schemas.StartNode | schemas.ConditionNode
-#     ),
-# ) -> None:
-#     """Raise an exception if another message is already assigned to specified start node"""
-#
-#     existing_message_node = (
-#         db.query(models.MessageNode)
-#         .filter(
-#             models.MessageNode.parent_node_id == message_node.parent_node_id,
-#             models.MessageNode.workflow_id == message_node.workflow_id,
-#         )
-#         .first()
-#     )
-#
-#     if (
-#         parent_node
-#         and parent_node.node_type == NodeTypes.START
-#         and existing_message_node
-#     ):
-#         raise HTTPException(
-#             status_code=status.HTTP_403_FORBIDDEN,
-#             detail="Another message node is already assigned to this start node.",
-#         )
-
-
-def existing_child_exception(
-    node: (
-        schemas.MessageNodeCreate
-        | schemas.ConditionNodeCreate
-        | schemas.EndNodeCreate
-    ),
-    parent_node: (
-        schemas.MessageNode | schemas.StartNode | schemas.ConditionNode
-    ),
-    db: CommonDB,
-    node_id: int | None = None,
-) -> None:
-    """Raise an exception if parent message node already has a child node"""
-
-    exception_models = [
-        models.MessageNode,
-        models.ConditionNode,
-        models.EndNode,
-    ]
-
-    if parent_node:
-        for exception_model in exception_models:
-            existing_message_child = (
-                db.query(exception_model)
-                .filter(
-                    and_(
-                        exception_model.parent_node_id == node.parent_node_id,
-                        exception_model.workflow_id == node.workflow_id,
-                        or_(
-                            parent_node.node_type == NodeTypes.MESSAGE,
-                            parent_node.node_type == NodeTypes.START,
-                        ),
-                    )
-                )
-                .first()
-            )
-
-            if (
-                existing_message_child
-                and node.parent_node_id != 0
-                and existing_message_child.id != node_id
-            ):
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f"Parent node with id {node.parent_node_id} already has a child node with id "
-                    f"{existing_message_child.id}.",
-                )
-
-
-def workflow_not_found_exception(
-    node: NodeTypeAlias,
-    db: CommonDB,
-) -> None:
-    """Raise an exception if specified workflow not found"""
-
-    existing_workflow = (
-        db.query(models.Workflow)
-        .filter(
-            models.Workflow.id == node.workflow_id,
-        )
-        .first()
-    )
-
-    if node.workflow_id != 0 and not existing_workflow:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Workflow with id {node.workflow_id} not found.",
-        )
-
-
-def exception_for_wrong_ref_id(
-    parent_node: (
-        schemas.MessageNode | schemas.StartNode | schemas.ConditionNode
-    ),
-    parent_node_id: int,
-) -> None:
-    """Raise an exception when a parent or reference node not found."""
-
-    if parent_node_id != 0 and parent_node is None:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Parent node with id {parent_node_id} not found",
-        )
-
-
 def exceptions_for_router_403(
-    node: (
-        schemas.MessageNodeCreate
-        | schemas.ConditionNodeCreate
-        | schemas.EndNodeCreate
-    ),
+    node: NodeTypeAlias,
     parent_node: (
         schemas.MessageNode | schemas.StartNode | schemas.ConditionNode
     ),
@@ -165,8 +31,7 @@ def exceptions_for_router_403(
 ) -> None:
     """Raise an exception if
     specified parent node not found or belongs to a different workflow,
-    or if specified workflow not found
-    or if parent_node is a Message node with existing child node"""
+    or if specified workflow not found"""
 
     workflow_not_found_exception(node=node, db=db)
 
@@ -174,18 +39,9 @@ def exceptions_for_router_403(
         parent_node=parent_node, parent_node_id=parent_node_id
     )
 
-    if parent_node:
-        if (
-            parent_node.workflow_id != 0
-            and node.workflow_id != 0
-            and parent_node_id != 0
-            and node.workflow_id != parent_node.workflow_id
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Parent {parent_node.node_type.upper()} node "
-                f"is from different workflow: {parent_node.workflow_id}.",
-            )
+    different_workflow_exception(
+        node=node, parent_node=parent_node, parent_node_id=parent_node_id
+    )
 
 
 def exceptions_for_condition_router_403(
@@ -231,6 +87,7 @@ def exceptions_for_condition_router_403(
         parent_node_id=condition_node.parent_node_id,
         db=db,
     )
+
     exceptions_for_router_403(
         node=condition_node,
         parent_node=parent_message_node,

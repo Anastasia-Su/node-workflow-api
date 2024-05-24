@@ -13,94 +13,7 @@ from nodes import models
 from dependencies import get_db
 from main import app
 from nodes.models import MessageStatuses, NodeTypes
-from tests.setup_test_db import setup_test_db
-
-
-def setup_db(engine, db):
-    models.Base.metadata.create_all(bind=engine)
-    insert_mock_data(db, "mock_db.json")
-    # setup_test_db(db)
-
-
-# Function to teardown the test database
-def teardown_test_db(engine):
-    models.Base.metadata.drop_all(bind=engine)
-    current_dir = os.path.dirname(__file__)
-    file_path = os.path.join(current_dir, "test.db")
-    if os.path.exists(file_path):
-        os.remove(file_path)
-
-
-#
-# # Pytest fixture to setup and teardown the test database
-# @pytest.fixture(scope="module")
-# def test_db():
-#     SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-#     engine = create_engine(SQLALCHEMY_DATABASE_URL)
-#
-#     TestingSessionLocal = sessionmaker(
-#         autocommit=False, autoflush=False, bind=engine
-#     )
-#
-#     db = TestingSessionLocal()
-#
-#     models.Base.metadata.create_all(bind=engine)
-#     insert_mock_data(db, "mock_db.json")
-#
-#     # setup_db(engine, db)
-#
-#     yield db
-#     teardown_test_db(engine)
-
-
-@pytest.fixture(scope="module")
-def test_db():
-    SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-    engine = create_engine(SQLALCHEMY_DATABASE_URL)
-
-    TestingSessionLocal = sessionmaker(
-        autocommit=False, autoflush=False, bind=engine
-    )
-    models.Base.metadata.create_all(bind=engine)
-    db = TestingSessionLocal()
-    # Uncomment below string to load mock data to test db.
-    # Before run tests again, comment it.
-    # insert_mock_data(db, "mock_db.json")
-    yield db
-    db.close()
-
-
-# Use the TestClient to send requests to the application
-@pytest.fixture
-def client(test_db):
-    def override_get_db():
-        yield test_db
-
-    app.dependency_overrides[get_db] = override_get_db
-    with TestClient(app) as client:
-        yield client
-
-
-def test_create_or_update_message_node_allowed(client):
-    node_id = 4
-
-    new_message_node_data = {
-        "status": MessageStatuses.PENDING,
-        "text": "Test message node",
-        "parent_node_id": 2,
-        "parent_condition_edge_id": 0,
-        "workflow_id": 2,
-    }
-
-    response_create = client.post(
-        "/message_nodes/", json=new_message_node_data
-    )
-    assert response_create.status_code == 200
-
-    response_update = client.put(
-        f"/message_nodes/{node_id}", json=new_message_node_data
-    )
-    assert response_update.status_code == 200
+from tests.setup_test_db import client, test_db
 
 
 def test_create_or_update_with_assigned_parent_node_forbidden(
@@ -174,6 +87,58 @@ def test_create_or_update_with_nonexistent_parent_id_forbidden(
     assert response_update.status_code == 403
 
 
+def test_create_or_update_with_nonexistent_workflow_id_forbidden(
+    client,
+):
+    """You can't reference workflow that does not exist in db"""
+
+    node_id = 4
+
+    new_message_node_data = {
+        "status": MessageStatuses.PENDING,
+        "text": "Test message node",
+        "parent_node_id": 0,
+        "parent_condition_edge_id": 0,
+        "workflow_id": 100,
+    }
+
+    response_create = client.post(
+        "/message_nodes/", json=new_message_node_data
+    )
+    assert response_create.status_code == 403
+
+    response_update = client.put(
+        f"/message_nodes/{node_id}", json=new_message_node_data
+    )
+    assert response_update.status_code == 403
+
+
+def test_create_or_update_with_parent_of_wrong_type_forbidden(
+    client,
+):
+    """End node can't be a parent for any node"""
+
+    node_id = 3
+
+    new_message_node_data = {
+        "status": MessageStatuses.PENDING,
+        "text": "Test message node",
+        "parent_node_id": 11,
+        "parent_condition_edge_id": 0,
+        "workflow_id": 1,
+    }
+
+    response_create = client.post(
+        "/message_nodes/", json=new_message_node_data
+    )
+    assert response_create.status_code == 403
+
+    response_update = client.put(
+        f"/message_nodes/{node_id}", json=new_message_node_data
+    )
+    assert response_update.status_code == 403
+
+
 def test_create_or_update_with_null_parent_allowed(client):
 
     node_id = 4
@@ -209,7 +174,7 @@ def test_read_single_message_node_allowed(client):
     assert response.status_code == 200
 
 
-def test_read_or_update_with_nonexistent_id_forbidden(
+def test_read_update_delete_with_nonexistent_id_forbidden(
     client,
 ):
     node_id = 100
@@ -228,3 +193,17 @@ def test_read_or_update_with_nonexistent_id_forbidden(
         f"/message_nodes/{node_id}", json=new_message_node_data
     )
     assert response_update.status_code == 404
+
+    response_delete = client.delete(f"/message_nodes/{node_id}")
+    # assert response_delete.status_code == 404
+    # assert response_delete.json()["detail"] == "hhllllll"
+
+
+#
+# def test_delete_message_node_allowed(client):
+#     node_id = 4
+#
+#     response_update = client.delete(
+#         f"/message_nodes/{node_id}"
+#     )
+#     assert response_update.status_code == 200
