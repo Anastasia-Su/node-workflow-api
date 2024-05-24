@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 def execute_workflow(
-        db: CommonDB, workflow_id: int
+    db: CommonDB, workflow_id: int
 ) -> dict[str, DiGraph | float]:
     workflow_node = crud_workflow.get_workflow_detail(
         db=db, node_id=workflow_id
@@ -165,10 +165,10 @@ def execute_workflow(
 
             if parent_message_node:
                 if (
-                        # parent_message_node.status.lower()
-                        # not in current_node.condition.lower()
-                        current_node.condition.split(" ")[-1].lower()
-                        == parent_message_node.status.lower()
+                    # parent_message_node.status.lower()
+                    # not in current_node.condition.lower()
+                    current_node.condition.split(" ")[-1].lower()
+                    == parent_message_node.status.lower()
                 ):
                     edge_value = ConditionEdges.YES
                 else:
@@ -179,7 +179,7 @@ def execute_workflow(
                         condition_edge
                         for condition_edge in condition_edges
                         if condition_edge.condition_node_id == current_node.id
-                           and condition_edge.edge == edge_value
+                        and condition_edge.edge == edge_value
                     ),
                     None,
                 )
@@ -196,8 +196,8 @@ def execute_workflow(
                         node
                         for node in message_nodes
                         if node.parent_node_id == current_node.id
-                           and node.parent_condition_edge_id
-                           == current_node.edge.id
+                        and node.parent_condition_edge_id
+                        == current_node.edge.id
                     ),
                     None,
                 )
@@ -207,7 +207,7 @@ def execute_workflow(
                             node
                             for node in condition_nodes
                             if node.parent_node_id == current_node.id
-                               and current_node.edge.edge == ConditionEdges.NO
+                            and current_node.edge.edge == ConditionEdges.NO
                         ),
                         None,
                     )
@@ -252,6 +252,7 @@ def execute_workflow(
     execution_time = end - start
 
     return {"graph": G, "execution_time": execution_time}
+
 
 # import logging
 # import random

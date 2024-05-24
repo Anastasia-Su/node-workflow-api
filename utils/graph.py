@@ -6,10 +6,10 @@ from matplotlib import pyplot as plt
 def build_graph(G: nx.DiGraph) -> None:
     plt.figure(figsize=(10, 8))
     node_color_map = {
-        "Start Node": "lightgreen",
-        "Message Node": "lightblue",
-        "Condition Node": "lightyellow",
-        "End Node": "lightcoral",
+        "Start": "lightgreen",
+        "Message": "lightblue",
+        "Condition": "lightyellow",
+        "End": "lightcoral",
     }
 
     labels = {}
@@ -24,7 +24,7 @@ def build_graph(G: nx.DiGraph) -> None:
             label_parts.append(f"Text: {data['text']}")
 
         if "condition" in data:
-            label_parts.append(f"Condition: {data['condition']}")
+            label_parts.append(f"{data['condition']}")
 
         labels[node] = "\n".join(label_parts)
 

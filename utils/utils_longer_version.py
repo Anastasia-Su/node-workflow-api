@@ -2,7 +2,6 @@ import logging
 import random
 import time
 import networkx as nx
-from fastapi import HTTPException
 from networkx import DiGraph
 
 from dependencies import CommonDB
@@ -11,6 +10,12 @@ from nodes.crud import crud_workflow, crud_message, crud_condition_edge
 from nodes.models import (
     ConditionEdges,
     MessageStatuses,
+)
+from utils.helper_funcs_for_utils import (
+    exception_no_next_node,
+    find_next_node,
+    exception_unknown_node_type,
+    exception_no_start_node,
 )
 from utils.graph import build_graph
 
@@ -32,7 +37,7 @@ def execute_workflow(
         else None
     )
     if not start_node:
-        raise HTTPException(status_code=404, detail="Start node not found")
+        exception_no_start_node()
 
     message_nodes = [
         node
@@ -64,23 +69,16 @@ def execute_workflow(
             logger.debug("Start Node Logic")
             G.add_node(
                 current_node.id,
-                label="Start Node",
+                label="Start",
                 message=current_node.message,
             )
-            next_node = next(
-                (
-                    node
-                    for node in message_nodes
-                    if node.parent_node_id == current_node.id
-                ),
-                None,
+
+            next_node = find_next_node(
+                node_list=message_nodes, current_node=current_node
             )
 
             if not next_node:
-                raise HTTPException(
-                    status_code=404,
-                    detail=f"No associated message node found for start node {current_node.id}",
-                )
+                exception_no_next_node(current_node=current_node)
 
             next_node.status = random.choice(list(MessageStatuses))
             db.commit()
@@ -93,38 +91,24 @@ def execute_workflow(
             logger.debug("Message Node Logic")
             G.add_node(
                 current_node.id,
-                label="Message Node",
+                label="Message",
                 status=current_node.status,
                 text=current_node.text,
             )
-
-            next_node = next(
-                (
-                    node
-                    for node in condition_nodes
-                    if node.parent_node_id == current_node.id
-                ),
-                None,
+            next_node = find_next_node(
+                node_list=condition_nodes, current_node=current_node
             )
+
             if not next_node:
-                next_node = next(
-                    (
-                        end_node
-                        for end_node in end_nodes
-                        if end_node.parent_node_id == current_node.id
-                    ),
-                    None,
+                next_node = find_next_node(
+                    node_list=end_nodes, current_node=current_node
                 )
 
             if not next_node:
-                next_node = next(
-                    (
-                        node
-                        for node in message_nodes
-                        if node.parent_node_id == current_node.id
-                    ),
-                    None,
+                next_node = find_next_node(
+                    node_list=message_nodes, current_node=current_node
                 )
+
                 if not next_node:
                     next_node = next(
                         (
@@ -146,10 +130,7 @@ def execute_workflow(
                         db.refresh(next_node)
 
             if not next_node:
-                raise HTTPException(
-                    status_code=404,
-                    detail=f"No associated condition or end node found for message node {current_node.id}",
-                )
+                exception_no_next_node(current_node=current_node)
 
             G.add_edge(current_node.id, next_node.id)
             current_node = next_node
@@ -158,7 +139,7 @@ def execute_workflow(
             logger.debug("Condition Node Logic")
             G.add_node(
                 current_node.id,
-                label="Condition Node",
+                label="Condition",
                 condition=current_node.condition,
             )
 
@@ -170,7 +151,6 @@ def execute_workflow(
                 ),
                 None,
             )
-            logger.debug(f"Parent message node: {parent_message_node}")
 
             if parent_message_node:
                 edge_value = (
@@ -218,10 +198,7 @@ def execute_workflow(
                     )
 
                 if not next_node:
-                    raise HTTPException(
-                        status_code=404,
-                        detail=f"No associated node found for condition node {current_node.id}",
-                    )
+                    exception_no_next_node(current_node=current_node)
 
                 G.add_edge(
                     current_node.id, next_node.id, label=condition_edge.edge
@@ -231,15 +208,12 @@ def execute_workflow(
         elif isinstance(current_node, models.EndNode):
             logger.debug("End Node Logic")
             G.add_node(
-                current_node.id, label="End Node", message=current_node.message
+                current_node.id, label="End", message=current_node.message
             )
             current_node = None
 
         else:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Unknown node type: {type(current_node)}",
-            )
+            exception_unknown_node_type(current_node=current_node)
 
     if iteration_count >= num_of_iterations:
         logger.error(
