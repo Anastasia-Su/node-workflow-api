@@ -27,6 +27,7 @@ def wrong_parent_exception(
     attribute: str,
 ) -> None:
     """Raise an exception when a parent node is of wrong type."""
+
     if parent_node and parent_node.node_type == node_type:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
