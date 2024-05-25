@@ -21,27 +21,25 @@ def read_condition_edges(
 
 
 @router.get(
-    "/condition_edges/{condition_edge_id}/",
+    "/condition_edges/{edge_id}/",
     response_model=schemas.ConditionEdge,
 )
 def read_single_condition_edge(
-    condition_edge_id: int, db: CommonDB
+    edge_id: int, db: CommonDB
 ) -> models.ConditionEdge:
     """Endpoint for retrieving a single condition edge"""
 
     db_condition_edge = crud_condition_edge.get_condition_edge_detail(
-        db=db, edge_id=condition_edge_id
+        db=db, edge_id=edge_id
     )
 
-    exceptions_for_router_404(
-        db_node=db_condition_edge, node_id=condition_edge_id
-    )
+    exceptions_for_router_404(db_node=db_condition_edge, node_id=edge_id)
 
     return db_condition_edge
 
 
 @router.put(
-    "/condition_edges/{condition_edge_id}",
+    "/condition_edges/{edge_id}",
     response_model=schemas.ConditionEdgeCreate,
 )
 def update_condition_edge_endpoint(
@@ -61,7 +59,7 @@ def update_condition_edge_endpoint(
 
 
 @router.delete(
-    "/condition_edges/{condition_edge_id}",
+    "/condition_edges/{edge_id}",
     response_model=schemas.ConditionEdge,
 )
 def delete_condition_edge(edge_id: int, db: CommonDB) -> models.ConditionEdge:

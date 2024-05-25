@@ -1,18 +1,4 @@
-import json
-import os
-from unittest.mock import MagicMock
-
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-from load_mock_data import insert_mock_data
-from nodes import models
-
-from dependencies import get_db
-from main import app
-from nodes.models import MessageStatuses, NodeTypes
+from nodes.models import MessageStatuses
 from tests.setup_test_db import client, test_db
 
 
@@ -195,8 +181,7 @@ def test_read_update_delete_with_nonexistent_id_forbidden(
     assert response_update.status_code == 404
 
     response_delete = client.delete(f"/message_nodes/{node_id}")
-    # assert response_delete.status_code == 404
-    # assert response_delete.json()["detail"] == "hhllllll"
+    assert response_delete.status_code == 404
 
 
 #

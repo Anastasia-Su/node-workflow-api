@@ -30,10 +30,10 @@ def get_condition_node_list(
 
 def get_condition_node_detail(
     db: Session, node_id: int
-) -> models.ConditionNode:
+) -> type(models.ConditionNode):
     """Retrieve a condition node with the given id"""
 
-    return db.query(models.ConditionNode).get(node_id)
+    return db.get(models.ConditionNode, node_id)
 
 
 def create_condition_node(

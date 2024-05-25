@@ -20,13 +20,13 @@ def read_end_nodes(
     return crud_end.get_end_node_list(db=db)
 
 
-@router.get("/end_nodes/{end_node_id}/", response_model=schemas.EndNode)
-def read_single_end_node(end_node_id: int, db: CommonDB) -> models.EndNode:
+@router.get("/end_nodes/{node_id}/", response_model=schemas.EndNode)
+def read_single_end_node(node_id: int, db: CommonDB) -> models.EndNode:
     """Endpoint for retrieving a single end node"""
 
-    db_node = crud_end.get_end_node_detail(db=db, node_id=end_node_id)
+    db_node = crud_end.get_end_node_detail(db=db, node_id=node_id)
 
-    exceptions_for_router_404(db_node=db_node, node_id=end_node_id)
+    exceptions_for_router_404(db_node=db_node, node_id=node_id)
 
     return db_node
 
@@ -44,7 +44,7 @@ def create_end_node_endpoint(
 
 
 @router.put(
-    "/end_nodes/{end_node_id}",
+    "/end_nodes/{node_id}",
     response_model=schemas.EndNodeCreate,
 )
 def update_end_node_endpoint(
@@ -65,7 +65,7 @@ def update_end_node_endpoint(
     return db_node
 
 
-@router.delete("/end_nodes/{end_node_id}", response_model=schemas.EndNode)
+@router.delete("/end_nodes/{node_id}", response_model=schemas.EndNode)
 def delete_end_node(node_id: int, db: CommonDB) -> models.EndNode:
     """Endpoint for deleting an end node"""
 

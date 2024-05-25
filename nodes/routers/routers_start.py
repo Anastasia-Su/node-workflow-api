@@ -20,17 +20,13 @@ def read_start_nodes(
     return crud_start.get_start_node_list(db=db)
 
 
-@router.get("/start_nodes/{start_node_id}/", response_model=schemas.StartNode)
-def read_single_start_node(
-    start_node_id: int, db: CommonDB
-) -> models.StartNode:
+@router.get("/start_nodes/{node_id}/", response_model=schemas.StartNode)
+def read_single_start_node(node_id: int, db: CommonDB) -> models.StartNode:
     """Endpoint for retrieving a single start node"""
 
-    db_start_node = crud_start.get_start_node_detail(
-        db=db, node_id=start_node_id
-    )
+    db_start_node = crud_start.get_start_node_detail(db=db, node_id=node_id)
 
-    exceptions_for_router_404(db_node=db_start_node, node_id=start_node_id)
+    exceptions_for_router_404(db_node=db_start_node, node_id=node_id)
 
     return db_start_node
 
@@ -48,7 +44,7 @@ def create_start_node_endpoint(
 
 
 @router.put(
-    "/start_nodes/{start_node_id}",
+    "/start_nodes/{node_id}",
     response_model=schemas.StartNodeCreate,
 )
 def update_start_node_endpoint(
@@ -68,9 +64,7 @@ def update_start_node_endpoint(
     return db_node
 
 
-@router.delete(
-    "/start_nodes/{start_node_id}", response_model=schemas.StartNode
-)
+@router.delete("/start_nodes/{node_id}", response_model=schemas.StartNode)
 def delete_start_node(node_id: int, db: CommonDB) -> type(models.StartNode):
     """Endpoint for deleting a start node"""
 

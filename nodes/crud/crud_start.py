@@ -8,9 +8,10 @@ def get_start_node_list(db: Session) -> list[type(models.StartNode)]:
     return db.query(models.StartNode).all()
 
 
-def get_start_node_detail(db: Session, node_id: int) -> models.StartNode:
+def get_start_node_detail(db: Session, node_id: int) -> type(models.StartNode):
     """Retrieve a start node with the given id"""
-    return db.query(models.StartNode).get(node_id)
+
+    return db.get(models.StartNode, node_id)
 
 
 def create_start_node(

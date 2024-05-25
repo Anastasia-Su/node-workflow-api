@@ -32,21 +32,19 @@ def read_condition_nodes(
 
 
 @router.get(
-    "/condition_nodes/{condition_node_id}/",
+    "/condition_nodes/{node_id}/",
     response_model=schemas.ConditionNode,
 )
 def read_single_condition_node(
-    condition_node_id: int, db: CommonDB
+    node_id: int, db: CommonDB
 ) -> models.ConditionNode:
     """Endpoint for retrieving a single condition node"""
 
     db_condition_node = crud_condition.get_condition_node_detail(
-        db=db, node_id=condition_node_id
+        db=db, node_id=node_id
     )
 
-    exceptions_for_router_404(
-        db_node=db_condition_node, node_id=condition_node_id
-    )
+    exceptions_for_router_404(db_node=db_condition_node, node_id=node_id)
 
     return db_condition_node
 
@@ -82,7 +80,7 @@ def create_condition_node_endpoint(
 
 
 @router.put(
-    "/condition_nodes/{condition_node_id}",
+    "/condition_nodes/{node_id}",
     response_model=schemas.ConditionNodeCreate,
 )
 def update_condition_node_endpoint(
@@ -106,7 +104,7 @@ def update_condition_node_endpoint(
 
 
 @router.delete(
-    "/condition_nodes/{condition_node_id}",
+    "/condition_nodes/{node_id}",
     response_model=schemas.ConditionNode,
 )
 def delete_condition_node(node_id: int, db: CommonDB) -> models.ConditionNode:

@@ -8,10 +8,10 @@ def get_end_node_list(db: Session) -> list[type(models.EndNode)]:
     return db.query(models.EndNode).all()
 
 
-def get_end_node_detail(db: Session, node_id: int) -> models.EndNode:
+def get_end_node_detail(db: Session, node_id: int) -> type(models.EndNode):
     """Retrieve an end node with the given id"""
 
-    return db.query(models.EndNode).get(node_id)
+    return db.get(models.EndNode, node_id)
 
 
 def create_end_node(

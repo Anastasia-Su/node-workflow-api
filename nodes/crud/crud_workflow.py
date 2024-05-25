@@ -10,10 +10,10 @@ def get_workflow_list(db: Session) -> list[type(models.Workflow)]:
     return db.query(models.Workflow).all()
 
 
-def get_workflow_detail(db: Session, node_id: int) -> models.Workflow:
+def get_workflow_detail(db: Session, node_id: int) -> type(models.Workflow):
     """Retrieve a workflow with the given id"""
 
-    node = db.query(models.Workflow).get(node_id)
+    node = db.get(models.Workflow, node_id)
 
     return node
 

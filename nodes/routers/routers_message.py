@@ -27,19 +27,15 @@ def read_message_nodes(
     )
 
 
-@router.get(
-    "/message_nodes/{message_node_id}/", response_model=schemas.MessageNode
-)
-def read_single_message_node(
-    message_node_id: int, db: CommonDB
-) -> models.MessageNode:
+@router.get("/message_nodes/{node_id}/", response_model=schemas.MessageNode)
+def read_single_message_node(node_id: int, db: CommonDB) -> models.MessageNode:
     """Endpoint for retrieving a single messages node"""
 
     db_message_node = crud_message.get_message_node_detail(
-        db=db, node_id=message_node_id
+        db=db, node_id=node_id
     )
 
-    exceptions_for_router_404(db_node=db_message_node, node_id=message_node_id)
+    exceptions_for_router_404(db_node=db_message_node, node_id=node_id)
 
     return db_message_node
 
@@ -57,30 +53,28 @@ def create_message_node_endpoint(
 
 
 @router.put(
-    "/message_nodes/{message_node_id}",
+    "/message_nodes/{node_id}",
     response_model=schemas.MessageNodeCreate,
 )
 def update_message_node_endpoint(
-    message_node_id: int, message_node: schemas.MessageNodeCreate, db: CommonDB
+    node_id: int, message_node: schemas.MessageNodeCreate, db: CommonDB
 ) -> models.MessageNode:
     """Endpoint for updating a messages node"""
 
     exceptions_for_message_router_403(
-        message_node=message_node, db=db, node_id=message_node_id
+        message_node=message_node, db=db, node_id=node_id
     )
 
     db_node = crud_message.update_message_node(
-        db=db, node_id=message_node_id, new_node=message_node
+        db=db, node_id=node_id, new_node=message_node
     )
 
-    exceptions_for_router_404(db_node=db_node, node_id=message_node_id)
+    exceptions_for_router_404(db_node=db_node, node_id=node_id)
 
     return db_node
 
 
-@router.delete(
-    "/message_nodes/{message_node_id}", response_model=schemas.MessageNode
-)
+@router.delete("/message_nodes/{node_id}", response_model=schemas.MessageNode)
 def delete_message_node(node_id: int, db: CommonDB) -> models.MessageNode:
     """Endpoint for deleting a messages node"""
 

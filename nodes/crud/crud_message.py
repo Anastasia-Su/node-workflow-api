@@ -1,4 +1,3 @@
-from fastapi import HTTPException, status
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from nodes import models, schemas
@@ -26,10 +25,12 @@ def get_message_node_list(
     return message_nodes.all()
 
 
-def get_message_node_detail(db: Session, node_id: int) -> models.MessageNode:
+def get_message_node_detail(
+    db: Session, node_id: int
+) -> type(models.MessageNode):
     """Retrieve a message node with the given id"""
 
-    return db.query(models.MessageNode).get(node_id)
+    return db.get(models.MessageNode, node_id)
 
 
 def create_message_node(

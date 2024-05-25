@@ -54,9 +54,9 @@ def exceptions_for_condition_router_403(
     wrong_parent_exception,
     existing_child_exception,"""
 
-    parent_node = db.query(models.Node).get(condition_node.parent_node_id)
-    parent_message_node = db.query(models.Node).get(
-        condition_node.parent_message_node_id
+    parent_node = db.get(models.Node, condition_node.parent_node_id)
+    parent_message_node = db.get(
+        models.Node, condition_node.parent_message_node_id
     )
 
     exceptions_nodes = [
@@ -109,7 +109,7 @@ def exceptions_for_condition_edge_router_403(
     """Raise an exception if specified edge already exists
     or reference condition does not exist"""
 
-    reference_node = db.query(models.Node).get(edge.condition_node_id)
+    reference_node = db.get(models.Node, edge.condition_node_id)
 
     exception_for_wrong_ref_id(
         parent_node=reference_node, parent_node_id=edge.condition_node_id
@@ -141,7 +141,7 @@ def exceptions_for_message_router_403(
     wrong_parent_exception,
     existing_child_exception"""
 
-    parent_node = db.query(models.Node).get(message_node.parent_node_id)
+    parent_node = db.get(models.Node, message_node.parent_node_id)
 
     wrong_parent_exception(
         parent_node=parent_node, node_type=NodeTypes.END, attribute="node"
@@ -167,7 +167,7 @@ def exceptions_for_end_router_403(
     exceptions_for_router_403,
     wrong_parent_exception"""
 
-    parent_node = db.query(models.Node).get(end_node.parent_node_id)
+    parent_node = db.get(models.Node, end_node.parent_node_id)
 
     exceptions = [NodeTypes.START, NodeTypes.END, NodeTypes.CONDITION]
 

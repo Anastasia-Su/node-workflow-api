@@ -10,10 +10,10 @@ def get_condition_edge_list(db: Session) -> list[type(models.ConditionEdge)]:
 
 def get_condition_edge_detail(
     db: Session, edge_id: int
-) -> models.ConditionEdge:
+) -> type(models.ConditionEdge):
     """Retrieve a condition edge with the given id"""
 
-    return db.query(models.ConditionEdge).get(edge_id)
+    return db.get(models.ConditionEdge, edge_id)
 
 
 def create_condition_edge(

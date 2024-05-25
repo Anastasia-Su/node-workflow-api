@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from database import SessionLocal
 
 
-async def get_db() -> Session:
+def get_db() -> Session:
     db = SessionLocal()
 
     try:
@@ -15,7 +15,7 @@ async def get_db() -> Session:
         db.close()
 
 
-async def common_db(db: Session = Depends(get_db)):
+def common_db(db: Session = Depends(get_db)):
     return db
 
 
