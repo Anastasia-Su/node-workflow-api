@@ -46,7 +46,9 @@ class ConditionEdge(Base):
     __tablename__ = "condition_edge"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    condition_node_id = Column(Integer, ForeignKey("condition.id"))
+    condition_node_id = Column(
+        Integer, ForeignKey("condition.id", use_alter=True)
+    )
     edge = Column(Enum(ConditionEdges))
     # TODO: add it and test
     # condition_node = relationship("ConditionNode", back_populates="edge")

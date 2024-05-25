@@ -15,6 +15,11 @@
      "id": 13,
      "message": "Start workflow 3",
      "workflow_id": 3
+     },
+     {
+     "id": 22,
+     "message": "Start workflow 1 another",
+     "workflow_id": 1
      }
    ]
  },
@@ -77,6 +82,14 @@
        "parent_node_id": 8,
        "parent_condition_edge_id": 1,
        "workflow_id": 1
+     },
+     {
+       "id": 20,
+       "status": "PENDING",
+       "text": "Sent: yes",
+       "parent_node_id": 0,
+       "parent_condition_edge_id": null,
+       "workflow_id": 1
      }
    ]
  },
@@ -109,6 +122,13 @@
        "parent_node_id": 15,
        "parent_message_node_id": 4,
        "workflow_id": 2
+     },
+     {
+       "id": 21,
+       "condition": "status == OPEN",
+       "parent_node_id": 0,
+       "parent_message_node_id": 0,
+       "workflow_id": 2
      }
    ]
  },
@@ -127,11 +147,23 @@
        "parent_node_id": 5,
        "workflow_id": 1
      },
-        {
+     {
        "id": 12,
        "message": "End, if open: no",
        "parent_node_id": 6,
        "workflow_id": 1
+     },
+      {
+       "id": 18,
+       "message": "End",
+       "parent_node_id": 17,
+       "workflow_id": 2
+     },
+      {
+       "id": 19,
+       "message": "End",
+       "parent_node_id": 0,
+       "workflow_id": 2
      }
     ]
  },
@@ -145,6 +177,10 @@
       {
        "id": 2,
        "name": "Workflow 2"
+     },
+      {
+       "id": 3,
+       "name": "Workflow 3"
      }
     ]
  },

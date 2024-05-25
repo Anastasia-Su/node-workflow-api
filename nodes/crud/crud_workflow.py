@@ -1,5 +1,3 @@
-import json
-
 from sqlalchemy.orm import Session
 from nodes import models, schemas
 
