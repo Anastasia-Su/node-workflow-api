@@ -129,6 +129,13 @@
        "parent_node_id": 0,
        "parent_message_node_id": 0,
        "workflow_id": 2
+     },
+     {
+       "id": 23,
+       "condition": "status == OPEN",
+       "parent_node_id": 0,
+       "parent_message_node_id": 0,
+       "workflow_id": 1
      }
    ]
  },

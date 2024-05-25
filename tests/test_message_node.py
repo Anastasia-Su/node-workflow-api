@@ -1,3 +1,4 @@
+from fastapi import status
 from nodes.models import MessageStatuses
 from tests.setup_test_db import client, test_db
 
@@ -17,12 +18,12 @@ def test_create_or_update_with_assigned_parent_node_forbidden(
     }
 
     response_create = client.post("/message_nodes/", json=new_node_data)
-    assert response_create.status_code == 403
+    assert response_create.status_code == status.HTTP_403_FORBIDDEN
 
     response_update = client.put(
         f"/message_nodes/{node_id}", json=new_node_data
     )
-    assert response_update.status_code == 403
+    assert response_update.status_code == status.HTTP_403_FORBIDDEN
 
 
 def test_create_or_update_for_different_workflow_forbidden(client):
@@ -39,12 +40,12 @@ def test_create_or_update_for_different_workflow_forbidden(client):
     }
 
     response_create = client.post("/message_nodes/", json=new_node_data)
-    assert response_create.status_code == 403
+    assert response_create.status_code == status.HTTP_403_FORBIDDEN
 
     response_update = client.put(
         f"/message_nodes/{node_id}", json=new_node_data
     )
-    assert response_update.status_code == 403
+    assert response_update.status_code == status.HTTP_403_FORBIDDEN
 
 
 def test_create_or_update_with_nonexistent_parent_id_forbidden(
@@ -63,12 +64,12 @@ def test_create_or_update_with_nonexistent_parent_id_forbidden(
     }
 
     response_create = client.post("/message_nodes/", json=new_node_data)
-    assert response_create.status_code == 403
+    assert response_create.status_code == status.HTTP_403_FORBIDDEN
 
     response_update = client.put(
         f"/message_nodes/{node_id}", json=new_node_data
     )
-    assert response_update.status_code == 403
+    assert response_update.status_code == status.HTTP_403_FORBIDDEN
 
 
 def test_create_or_update_with_nonexistent_workflow_id_forbidden(
@@ -87,12 +88,12 @@ def test_create_or_update_with_nonexistent_workflow_id_forbidden(
     }
 
     response_create = client.post("/message_nodes/", json=new_node_data)
-    assert response_create.status_code == 403
+    assert response_create.status_code == status.HTTP_403_FORBIDDEN
 
     response_update = client.put(
         f"/message_nodes/{node_id}", json=new_node_data
     )
-    assert response_update.status_code == 403
+    assert response_update.status_code == status.HTTP_403_FORBIDDEN
 
 
 def test_create_or_update_with_parent_of_wrong_type_forbidden(
@@ -111,12 +112,12 @@ def test_create_or_update_with_parent_of_wrong_type_forbidden(
     }
 
     response_create = client.post("/message_nodes/", json=new_node_data)
-    assert response_create.status_code == 403
+    assert response_create.status_code == status.HTTP_403_FORBIDDEN
 
     response_update = client.put(
         f"/message_nodes/{node_id}", json=new_node_data
     )
-    assert response_update.status_code == 403
+    assert response_update.status_code == status.HTTP_403_FORBIDDEN
 
 
 def test_read_update_delete_with_nonexistent_id_forbidden(
@@ -134,15 +135,15 @@ def test_read_update_delete_with_nonexistent_id_forbidden(
     }
 
     response_retrieve = client.get(f"/message_nodes/{node_id}/")
-    assert response_retrieve.status_code == 404
+    assert response_retrieve.status_code == status.HTTP_404_NOT_FOUND
 
     response_update = client.put(
         f"/message_nodes/{node_id}", json=new_node_data
     )
-    assert response_update.status_code == 404
+    assert response_update.status_code == status.HTTP_404_NOT_FOUND
 
     response_delete = client.delete(f"/message_nodes/{node_id}")
-    assert response_delete.status_code == 404
+    assert response_delete.status_code == status.HTTP_404_NOT_FOUND
 
 
 def test_create_or_update_with_null_parent_allowed(client):
@@ -158,12 +159,12 @@ def test_create_or_update_with_null_parent_allowed(client):
     }
 
     response_create = client.post("/message_nodes/", json=new_node_data)
-    assert response_create.status_code == 200
+    assert response_create.status_code == status.HTTP_200_OK
 
     response_update = client.put(
         f"/message_nodes/{node_id}", json=new_node_data
     )
-    assert response_update.status_code == 200
+    assert response_update.status_code == status.HTTP_200_OK
 
 
 def test_read_message_nodes_allowed(client):
@@ -171,7 +172,7 @@ def test_read_message_nodes_allowed(client):
 
     response = client.get(f"/message_nodes/")
 
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
 
 
 def test_read_single_node_allowed(client):
@@ -180,7 +181,7 @@ def test_read_single_node_allowed(client):
     node_id = 3
     response = client.get(f"/message_nodes/{node_id}/")
 
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
 
 
 def test_delete_node_allowed(client):
@@ -189,4 +190,4 @@ def test_delete_node_allowed(client):
     node_id = 4
 
     response_update = client.delete(f"/message_nodes/{node_id}")
-    assert response_update.status_code == 200
+    assert response_update.status_code == status.HTTP_200_OK
