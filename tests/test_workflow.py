@@ -1,3 +1,5 @@
+from urllib import response
+
 from fastapi import status
 from tests.setup_test_db import client, test_db
 
@@ -30,7 +32,7 @@ def test_read_workflows_allowed(client):
     assert response.status_code == status.HTTP_200_OK
 
 
-def test_read_single_node_allowed(client):
+def test_read_single_workflow_allowed(client):
     """You should be able to get a single workflow"""
 
     workflow_id = 1
@@ -39,30 +41,22 @@ def test_read_single_node_allowed(client):
     assert response.status_code == status.HTTP_200_OK
 
 
-def test_workflow_no_start_node(client):
-    """Workflow should start with a Start node"""
+def test_workflow_executed(client):
+    """You should be able to execute a workflow"""
 
-    workflow_id = 3
+    workflow_id = 1
 
-    response = client.post(f"/workflows/execute/{workflow_id}")
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    response = client.post(
+        f"/workflows/execute/{workflow_id}?draw_graph=false"
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert "graph" in response.json()
 
 
-# def test_workflow_executed(client):
-#     """You should be able to execute a workflow"""
-#
-#     workflow_id = 1
-#
-#     response = client.post(
-#         f"/workflows/execute/", json={"workflow_id": workflow_id}
-#     )
-#     assert response.status_code == status.HTTP_200_OK
+def test_delete_workflow_allowed(client):
+    """You should be able to delete a single workflow"""
 
-#
-# def test_delete_workflow_allowed(client):
-#     """You should be able to delete a single workflow"""
-#
-#     workflow_id = 3
-#
-#     response = client.delete(f"/workflows/{workflow_id}")
-#     assert response.status_code == status.HTTP_200_OK
+    workflow_id = 4
+
+    response = client.delete(f"/workflows/{workflow_id}")
+    assert response.status_code == status.HTTP_200_OK

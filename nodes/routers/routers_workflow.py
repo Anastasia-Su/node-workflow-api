@@ -1,4 +1,5 @@
 import networkx as nx
+from sqlalchemy.orm import Query
 
 from nodes.routers.exceptions_for_routers.exceptions import (
     exceptions_for_router_404,
@@ -87,8 +88,7 @@ def delete_workflow(workflow_id: int, db: CommonDB) -> models.Workflow:
 
 @router.post("/workflows/execute/{workflow_id}")
 def run_workflow(
-    db: CommonDB,
-    workflow_id: int,
+    db: CommonDB, workflow_id: int, draw_graph: bool = Query(True)
 ) -> JSONResponse:
     """Endpoint for executing a workflow"""
 
@@ -96,7 +96,9 @@ def run_workflow(
     exceptions_for_router_404(db_node=db_workflow, node_id=workflow_id)
 
     try:
-        result = execute_workflow(db, workflow_id)
+        result = execute_workflow(
+            db=db, workflow_id=workflow_id, draw_graph=draw_graph
+        )
         response = {
             "message": "Workflow executed successfully",
             "execution_time": result["execution_time"],

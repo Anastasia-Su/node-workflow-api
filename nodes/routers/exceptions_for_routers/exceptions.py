@@ -1,5 +1,6 @@
 from typing import Union
 from fastapi import HTTPException, status
+from sqlalchemy.orm import joinedload
 
 from dependencies import CommonDB
 from nodes import schemas, models
@@ -11,6 +12,7 @@ from nodes.routers.exceptions_for_routers.building_blocks import (
     wrong_parent_exception,
     existing_child_exception,
     exception_if_more_than_one_node,
+    existing_two_children_exception,
 )
 
 
@@ -103,6 +105,13 @@ def exceptions_for_condition_router_403(
         db=db,
     )
 
+    existing_two_children_exception(
+        node_id=node_id,
+        node=condition_node,
+        parent_node=parent_node,
+        db=db,
+    )
+
 
 def exceptions_for_condition_edge_router_403(
     edge: schemas.ConditionEdgeCreate, db: CommonDB
@@ -157,6 +166,13 @@ def exceptions_for_message_router_403(
 
     existing_child_exception(
         node=message_node, parent_node=parent_node, db=db, node_id=node_id
+    )
+
+    existing_two_children_exception(
+        node_id=node_id,
+        node=message_node,
+        parent_node=parent_node,
+        db=db,
     )
 
 

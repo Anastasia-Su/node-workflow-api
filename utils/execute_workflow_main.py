@@ -19,7 +19,7 @@ from utils.graph import build_graph
 
 
 def execute_workflow(
-    db: CommonDB, workflow_id: int
+    db: CommonDB, workflow_id: int, draw_graph: bool = True
 ) -> dict[str, DiGraph | float]:
 
     workflow_node = crud_workflow.get_workflow_detail(
@@ -81,7 +81,8 @@ def execute_workflow(
 
     end = time.time()
 
-    build_graph(G)
+    if draw_graph:
+        build_graph(G)
     execution_time = end - start
 
     return {"graph": G, "execution_time": execution_time}

@@ -31,18 +31,14 @@ def wrong_parent_exception(
 
 
 def existing_child_exception(
-    node: (
-        schemas.MessageNodeCreate
-        | schemas.ConditionNodeCreate
-        | schemas.EndNodeCreate
-    ),
+    node: NodeTypeAlias,
     parent_node: (
         schemas.MessageNode | schemas.StartNode | schemas.ConditionNode
     ),
     db: CommonDB,
     node_id: int | None = None,
 ) -> None:
-    """Raise an exception if parent message node already has a child node"""
+    """Raise an exception if parent message or start node already has a child node"""
 
     exception_models = [
         models.MessageNode,
@@ -76,6 +72,47 @@ def existing_child_exception(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail=f"Parent node with id {node.parent_node_id} already has a child node with id "
                     f"{existing_message_child.id}.",
+                )
+
+
+def existing_two_children_exception(
+    node: NodeTypeAlias,
+    parent_node: (
+        schemas.MessageNode | schemas.StartNode | schemas.ConditionNode
+    ),
+    db: CommonDB,
+    node_id: int | None = None,
+) -> None:
+    """Raise an exception if parent condition node already has a child node"""
+
+    exception_models = [models.MessageNode, models.ConditionNode]
+
+    if parent_node:
+
+        for exception_model in exception_models:
+            existing_message_children = (
+                db.query(exception_model)
+                .filter(
+                    exception_model.parent_node_id == node.parent_node_id,
+                    exception_model.workflow_id == node.workflow_id,
+                    # parent_node.node_type == NodeTypes.CONDITION,
+                )
+                .all()
+            )
+            total_children = len(existing_message_children)
+
+            if (
+                existing_message_children
+                and total_children >= 2
+                and node.parent_node_id != 0
+                # and node_id
+                # not in [child.id for child in existing_message_children]
+                # and child.id != node_id
+                # for child in existing_message_children
+            ):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail=f"Parent node with id {node.parent_node_id} already has two child nodes.",
                 )
 
 
