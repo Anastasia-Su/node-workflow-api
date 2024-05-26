@@ -82,7 +82,7 @@ def test_create_or_update_with_nonexistent_workflow_id_forbidden(
 def test_create_or_update_with_parent_of_wrong_type_forbidden(
     client,
 ):
-    """End or Start node can't be a parent for condition node"""
+    """End or Start node can't be a parent for end node"""
 
     node_id = 12
 
@@ -154,14 +154,14 @@ def test_create_or_update_with_null_parent_allowed(client):
 
 
 def test_read_nodes_allowed(client):
-    """You should be able to get all condition nodes"""
+    """You should be able to get all end nodes"""
     response = client.get(f"/end_nodes/")
 
     assert response.status_code == status.HTTP_200_OK
 
 
 def test_read_single_node_allowed(client):
-    """You should be able to get a single condition node"""
+    """You should be able to get a single end node"""
 
     node_id = 12
     response = client.get(f"/end_nodes/{node_id}/")
@@ -170,9 +170,9 @@ def test_read_single_node_allowed(client):
 
 
 def test_delete_node_allowed(client):
-    """You should be able to delete a single condition node"""
+    """You should be able to delete a single end node"""
 
     node_id = 19
 
-    response_update = client.delete(f"/end_nodes/{node_id}")
-    assert response_update.status_code == status.HTTP_200_OK
+    response = client.delete(f"/end_nodes/{node_id}")
+    assert response.status_code == status.HTTP_200_OK

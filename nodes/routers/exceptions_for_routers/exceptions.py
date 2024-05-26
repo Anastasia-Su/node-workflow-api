@@ -10,6 +10,7 @@ from nodes.routers.exceptions_for_routers.building_blocks import (
     different_workflow_exception,
     wrong_parent_exception,
     existing_child_exception,
+    exception_if_more_than_one_node,
 )
 
 
@@ -187,6 +188,19 @@ def exceptions_for_end_router_403(
         parent_node=parent_node,
         parent_node_id=end_node.parent_node_id,
         db=db,
+    )
+
+
+def exceptions_for_start_router_403(
+    start_node: schemas.StartNodeCreate, db: CommonDB
+):
+    """Combine exceptions from the functions:
+    workflow_not_found_exception,
+    exception_if_more_than_one_node,"""
+
+    workflow_not_found_exception(node=start_node, db=db)
+    exception_if_more_than_one_node(
+        node=start_node, models_node=models.StartNode, db=db
     )
 
 

@@ -132,3 +132,25 @@ def exception_for_wrong_ref_id(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Parent node with id {parent_node_id} not found",
         )
+
+
+def exception_if_more_than_one_node(
+    node: NodeTypeAlias,
+    models_node: type(models.StartNode) | type(models.EndNode),
+    db: CommonDB,
+) -> None:
+    """Raise an exception when specified workflow already has a node of this type"""
+
+    existing_node = (
+        db.query(models_node)
+        .filter(
+            models_node.workflow_id == node.workflow_id,
+        )
+        .first()
+    )
+
+    if existing_node:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"This workflow already has {models_node().node_type.upper()} node",
+        )

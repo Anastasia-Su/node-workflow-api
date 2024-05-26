@@ -6,6 +6,7 @@ from nodes.crud import crud_start
 from nodes.routers.exceptions_for_routers.exceptions import (
     exceptions_for_router_404,
     workflow_not_found_exception,
+    exceptions_for_start_router_403,
 )
 
 router = APIRouter()
@@ -38,7 +39,7 @@ def create_start_node_endpoint(
 ) -> models.StartNode:
     """Endpoint for creating a start node"""
 
-    workflow_not_found_exception(node=start_node, db=db)
+    exceptions_for_start_router_403(start_node=start_node, db=db)
 
     return crud_start.create_start_node(db=db, node=start_node)
 
@@ -59,7 +60,7 @@ def update_start_node_endpoint(
     )
 
     exceptions_for_router_404(db_node=db_node, node_id=node_id)
-    workflow_not_found_exception(node=node, db=db)
+    exceptions_for_start_router_403(start_node=node, db=db)
 
     return db_node
 

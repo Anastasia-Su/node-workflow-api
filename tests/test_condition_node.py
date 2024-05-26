@@ -212,5 +212,5 @@ def test_delete_node_allowed(client):
 
     node_id = 21
 
-    response_update = client.delete(f"/condition_nodes/{node_id}")
-    assert response_update.status_code == status.HTTP_200_OK
+    response = client.delete(f"/condition_nodes/{node_id}")
+    assert response.status_code == status.HTTP_200_OK

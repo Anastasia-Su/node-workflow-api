@@ -4,8 +4,8 @@ from nodes.routers.exceptions_for_routers.exceptions import (
     exceptions_for_router_404,
 )
 
-# from utils.utils_for_execute_router import execute_workflow
 
+# from utils.utils_for_execute_router import execute_workflow
 from utils.execute_workflow_main import execute_workflow
 
 # from utils.utils_alternative import execute_workflow
@@ -85,8 +85,11 @@ def delete_workflow(workflow_id: int, db: CommonDB) -> models.Workflow:
     return db_workflow
 
 
-@router.post("/workflows/execute")
-def run_workflow(db: CommonDB, workflow_id: int) -> JSONResponse:
+@router.post("/workflows/execute/{workflow_id}")
+def run_workflow(
+    db: CommonDB,
+    workflow_id: int,
+) -> JSONResponse:
     """Endpoint for executing a workflow"""
 
     db_workflow = crud_workflow.get_workflow_detail(db=db, node_id=workflow_id)
