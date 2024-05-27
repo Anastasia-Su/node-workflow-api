@@ -1,4 +1,62 @@
 [
+  {
+   "workflows":
+    [
+      {
+       "id": 1,
+       "name": "Workflow 1"
+     },
+      {
+       "id": 2,
+       "name": "Workflow 2"
+     }
+    ]
+ },
+  {
+   "condition_edges":
+    [
+      {
+       "id": 1,
+       "condition_node_id": 8,
+       "edge": "YES"
+     },
+      {
+       "id": 2,
+       "condition_node_id": 8,
+       "edge": "NO"
+     },
+      {
+       "id": 3,
+       "condition_node_id": 9,
+       "edge": "YES"
+     },
+      {
+       "id": 4,
+       "condition_node_id": 9,
+       "edge": "NO"
+     },
+      {
+       "id": 5,
+       "condition_node_id": 14,
+       "edge": "YES"
+     },
+      {
+       "id": 6,
+       "condition_node_id": 14,
+       "edge": "NO"
+     },
+      {
+       "id": 7,
+       "condition_node_id": 15,
+       "edge": "YES"
+     },
+      {
+       "id": 8,
+       "condition_node_id": 15,
+       "edge": "NO"
+     }
+    ]
+  },
  {
    "start_nodes": [
      {
@@ -161,63 +219,6 @@
        "workflow_id": 1
      }
     ]
- },
- {
-   "workflows":
-    [
-      {
-       "id": 1,
-       "name": "Workflow 1"
-     },
-      {
-       "id": 2,
-       "name": "Workflow 2"
-     }
-    ]
- },
- {
-   "condition_edges":
-    [
-      {
-       "id": 1,
-       "condition_node_id": 8,
-       "edge": "YES"
-     },
-      {
-       "id": 2,
-       "condition_node_id": 8,
-       "edge": "NO"
-     },
-      {
-       "id": 3,
-       "condition_node_id": 9,
-       "edge": "YES"
-     },
-      {
-       "id": 4,
-       "condition_node_id": 9,
-       "edge": "NO"
-     },
-      {
-       "id": 5,
-       "condition_node_id": 14,
-       "edge": "YES"
-     },
-      {
-       "id": 6,
-       "condition_node_id": 14,
-       "edge": "NO"
-     },
-      {
-       "id": 7,
-       "condition_node_id": 15,
-       "edge": "YES"
-     },
-      {
-       "id": 8,
-       "condition_node_id": 15,
-       "edge": "NO"
-     }
-    ]
-  }
+ }
+
 ]

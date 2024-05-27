@@ -19,12 +19,6 @@ class MessageStatuses(StrEnum):
     OPEN = auto()
 
 
-class EnumConditions(StrEnum):
-    SENT_CONDITION = f"status == {MessageStatuses.SENT.value}"
-    OPEN_CONDITION = f"status == {MessageStatuses.OPEN.value}"
-    PENDING_CONDITION = f"status == {MessageStatuses.PENDING.value}"
-
-
 class NodeTypes(StrEnum):
     START = auto()
     MESSAGE = auto()
@@ -65,7 +59,9 @@ class StartNode(Node):
     id = Column(Integer, ForeignKey("node.id"), primary_key=True)
     message = Column(String(255), nullable=True)
 
-    workflow_id = Column(Integer, ForeignKey("workflow.id"), nullable=True)
+    workflow_id = Column(
+        Integer, ForeignKey("workflow.id", ondelete="SET NULL"), nullable=True
+    )
 
     workflow = relationship(
         "Workflow",
@@ -76,12 +72,6 @@ class StartNode(Node):
         "polymorphic_identity": NodeTypes.START,
     }
 
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["workflow_id"], ["workflow.id"], ondelete="SET NULL"
-        ),
-    )
-
 
 class MessageNode(Node):
     __tablename__ = "message"
@@ -90,12 +80,18 @@ class MessageNode(Node):
     status = Column(Enum(MessageStatuses), nullable=False)
     text = Column(String(511), nullable=False)
 
-    parent_node_id = Column(Integer, ForeignKey("node.id"), nullable=True)
+    parent_node_id = Column(
+        Integer, ForeignKey("node.id", ondelete="SET NULL"), nullable=True
+    )
     parent_condition_edge_id = Column(
-        Integer, ForeignKey("condition_edge.id"), nullable=True
+        Integer,
+        ForeignKey("condition_edge.id", ondelete="SET NULL"),
+        nullable=True,
     )
 
-    workflow_id = Column(Integer, ForeignKey("workflow.id"), nullable=True)
+    workflow_id = Column(
+        Integer, ForeignKey("workflow.id", ondelete="SET NULL"), nullable=True
+    )
     workflow = relationship(
         "Workflow",
         back_populates="message_nodes",
@@ -106,12 +102,6 @@ class MessageNode(Node):
         "inherit_condition": (id == Node.id),
     }
 
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["workflow_id"], ["workflow.id"], ondelete="SET NULL"
-        ),
-    )
-
 
 class ConditionNode(Node):
     __tablename__ = "condition"
@@ -119,14 +109,18 @@ class ConditionNode(Node):
     id = Column(Integer, ForeignKey("node.id"), primary_key=True)
     condition = Column(String, nullable=False)
 
-    parent_node_id = Column(Integer, ForeignKey("node.id"), nullable=True)
+    parent_node_id = Column(
+        Integer, ForeignKey("node.id", ondelete="SET NULL"), nullable=True
+    )
     parent_message_node_id = Column(
-        Integer, ForeignKey("message.id"), nullable=True
+        Integer, ForeignKey("message.id", ondelete="SET NULL"), nullable=True
     )
 
     edge = relationship("ConditionEdge", uselist=False, backref="condition")
 
-    workflow_id = Column(Integer, ForeignKey("workflow.id"), nullable=True)
+    workflow_id = Column(
+        Integer, ForeignKey("workflow.id", ondelete="SET NULL"), nullable=True
+    )
 
     workflow = relationship(
         "Workflow",
@@ -138,12 +132,6 @@ class ConditionNode(Node):
         "inherit_condition": (id == Node.id),
     }
 
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["workflow_id"], ["workflow.id"], ondelete="SET NULL"
-        ),
-    )
-
 
 class EndNode(Node):
     __tablename__ = "end"
@@ -152,9 +140,13 @@ class EndNode(Node):
 
     message = Column(String(255), nullable=True)
 
-    parent_node_id = Column(Integer, ForeignKey("message.id"), nullable=True)
+    parent_node_id = Column(
+        Integer, ForeignKey("message.id", ondelete="SET NULL"), nullable=True
+    )
 
-    workflow_id = Column(Integer, ForeignKey("workflow.id"), nullable=True)
+    workflow_id = Column(
+        Integer, ForeignKey("workflow.id", ondelete="SET NULL"), nullable=True
+    )
 
     workflow = relationship(
         "Workflow",
@@ -165,12 +157,6 @@ class EndNode(Node):
         "polymorphic_identity": NodeTypes.END,
     }
 
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["workflow_id"], ["workflow.id"], ondelete="SET NULL"
-        ),
-    )
-
 
 class Workflow(Base):
     __tablename__ = "workflow"
@@ -179,20 +165,13 @@ class Workflow(Base):
     name = Column(String(255), nullable=False, unique=True)
 
     start_node = relationship(
-        "StartNode", back_populates="workflow", uselist=False
+        "StartNode",
+        back_populates="workflow",
+        uselist=False,
     )
 
-    message_nodes = relationship(
-        "MessageNode",
-        back_populates="workflow",
-    )
+    message_nodes = relationship("MessageNode", back_populates="workflow")
 
-    condition_nodes = relationship(
-        "ConditionNode",
-        back_populates="workflow",
-    )
+    condition_nodes = relationship("ConditionNode", back_populates="workflow")
 
-    end_nodes = relationship(
-        "EndNode",
-        back_populates="workflow",
-    )
+    end_nodes = relationship("EndNode", back_populates="workflow")

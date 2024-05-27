@@ -36,7 +36,7 @@
        "status": "PENDING",
        "text": "Open: yes",
        "parent_node_id": 9,
-       "parent_condition_edge_id": 3,
+       "parent_condition_edge_id": null,
        "workflow_id": 1
      },
      {
@@ -44,7 +44,7 @@
        "status": "PENDING",
        "text": "Open: no",
        "parent_node_id": 9,
-       "parent_condition_edge_id": 4,
+       "parent_condition_edge_id": null,
        "workflow_id": 1
      },
      {
@@ -52,7 +52,7 @@
        "status": "PENDING",
        "text": "Sent: yes",
        "parent_node_id": 8,
-       "parent_condition_edge_id": 1,
+       "parent_condition_edge_id": null,
        "workflow_id": 1
      }
    ]

@@ -1,14 +1,18 @@
 import json
+import os
 import sys
 
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from database import Base
 from nodes import models
 
+load_dotenv()
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./node-workflow.db"
+# SQLALCHEMY_DATABASE_URL = "sqlite:///./node-workflow.db"
+SQLALCHEMY_DATABASE_URL = os.environ["SQLALCHEMY_DATABASE_URL"]
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -26,6 +30,18 @@ def insert_mock_data(db, file_name):
         workflows = workflow_data.get("workflows", [])
         condition_edges = workflow_data.get("condition_edges", [])
 
+        for w_data in workflows:
+            workflow = models.Workflow(id=w_data["id"], name=w_data["name"])
+            db.add(workflow)
+
+        for edge_data in condition_edges:
+            c_edge = models.ConditionEdge(
+                id=edge_data["id"],
+                condition_node_id=edge_data["condition_node_id"],
+                edge=edge_data["edge"],
+            )
+            db.add(c_edge)
+
         for start_node_data in start_nodes:
             start_node = models.StartNode(
                 id=start_node_data["id"],
@@ -33,7 +49,6 @@ def insert_mock_data(db, file_name):
                 workflow_id=start_node_data["workflow_id"],
             )
             db.add(start_node)
-            db.commit()
 
         for message_node_data in message_nodes:
             message_node = models.MessageNode(
@@ -47,7 +62,6 @@ def insert_mock_data(db, file_name):
                 workflow_id=message_node_data["workflow_id"],
             )
             db.add(message_node)
-            db.commit()
 
         for condition_node_data in condition_nodes:
             condition_node = models.ConditionNode(
@@ -60,7 +74,6 @@ def insert_mock_data(db, file_name):
                 workflow_id=condition_node_data["workflow_id"],
             )
             db.add(condition_node)
-            db.commit()
 
         for end_node_data in end_nodes:
             end_node = models.EndNode(
@@ -70,21 +83,8 @@ def insert_mock_data(db, file_name):
                 workflow_id=end_node_data["workflow_id"],
             )
             db.add(end_node)
-            db.commit()
 
-        for w_data in workflows:
-            workflow = models.Workflow(id=w_data["id"], name=w_data["name"])
-            db.add(workflow)
-            db.commit()
-
-        for edge_data in condition_edges:
-            c_edge = models.ConditionEdge(
-                id=edge_data["id"],
-                condition_node_id=edge_data["condition_node_id"],
-                edge=edge_data["edge"],
-            )
-            db.add(c_edge)
-            db.commit()
+    db.commit()
 
 
 if __name__ == "__main__":
@@ -94,7 +94,19 @@ if __name__ == "__main__":
     db = SessionLocal()
 
     try:
-        insert_mock_data(db, "mock_db.json")
+        insert_mock_data(db, filename)
+        print("Mock data loaded successfully.")
     finally:
         db.close()
-    print("Mock data loaded successfully.")
+    # transaction = db.begin()
+    #
+    # try:
+    #     insert_mock_data(db, filename)
+    #     transaction.commit()
+    #     print("Mock data loaded successfully.")
+    # except Exception as e:
+    #     transaction.rollback()
+    #     print(f"Error loading mock data: {e}")
+    # finally:
+    #     db.close()
+    # print("Mock data loaded successfully.")
