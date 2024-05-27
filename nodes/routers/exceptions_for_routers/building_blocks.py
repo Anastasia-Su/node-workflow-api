@@ -83,7 +83,7 @@ def existing_two_children_exception(
     db: CommonDB,
     node_id: int | None = None,
 ) -> None:
-    """Raise an exception if parent condition node already has a child node"""
+    """Raise an exception if parent condition node already has two child nodes"""
 
     exception_models = [models.MessageNode, models.ConditionNode]
 
@@ -105,10 +105,8 @@ def existing_two_children_exception(
                 existing_message_children
                 and total_children >= 2
                 and node.parent_node_id != 0
-                # and node_id
-                # not in [child.id for child in existing_message_children]
-                # and child.id != node_id
-                # for child in existing_message_children
+                and node_id
+                not in [child.id for child in existing_message_children]
             ):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
