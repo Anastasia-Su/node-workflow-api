@@ -1,6 +1,13 @@
 from enum import auto, StrEnum
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    ForeignKey,
+    Enum,
+    ForeignKeyConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from database import Base
@@ -50,8 +57,6 @@ class ConditionEdge(Base):
         Integer, ForeignKey("condition.id", use_alter=True)
     )
     edge = Column(Enum(ConditionEdges))
-    # TODO: add it and test
-    # condition_node = relationship("ConditionNode", back_populates="edge")
 
 
 class StartNode(Node):
@@ -70,6 +75,12 @@ class StartNode(Node):
     __mapper_args__ = {
         "polymorphic_identity": NodeTypes.START,
     }
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["workflow_id"], ["workflow.id"], ondelete="SET NULL"
+        ),
+    )
 
 
 class MessageNode(Node):
@@ -95,21 +106,24 @@ class MessageNode(Node):
         "inherit_condition": (id == Node.id),
     }
 
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["workflow_id"], ["workflow.id"], ondelete="SET NULL"
+        ),
+    )
+
 
 class ConditionNode(Node):
     __tablename__ = "condition"
 
     id = Column(Integer, ForeignKey("node.id"), primary_key=True)
     condition = Column(String, nullable=False)
-    # condition = Column(Enum(EnumConditions).values_callable, nullable=False)
 
     parent_node_id = Column(Integer, ForeignKey("node.id"), nullable=True)
     parent_message_node_id = Column(
         Integer, ForeignKey("message.id"), nullable=True
     )
 
-    # TODO: Try to implement it and test
-    # edge = relationship("ConditionEdge", uselist=False, back_populates="condition_node", cascade="all, delete-orphan")
     edge = relationship("ConditionEdge", uselist=False, backref="condition")
 
     workflow_id = Column(Integer, ForeignKey("workflow.id"), nullable=True)
@@ -123,6 +137,12 @@ class ConditionNode(Node):
         "polymorphic_identity": NodeTypes.CONDITION,
         "inherit_condition": (id == Node.id),
     }
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["workflow_id"], ["workflow.id"], ondelete="SET NULL"
+        ),
+    )
 
 
 class EndNode(Node):
@@ -144,6 +164,12 @@ class EndNode(Node):
     __mapper_args__ = {
         "polymorphic_identity": NodeTypes.END,
     }
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["workflow_id"], ["workflow.id"], ondelete="SET NULL"
+        ),
+    )
 
 
 class Workflow(Base):

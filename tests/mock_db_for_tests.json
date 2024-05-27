@@ -237,6 +237,11 @@
        "id": 8,
        "condition_node_id": 16,
        "edge": "NO"
+     },
+      {
+       "id": 9,
+       "condition_node_id": 0,
+       "edge": "NO"
      }
     ]
   }

@@ -66,7 +66,7 @@ def test_read_nodes_allowed(client):
 
 
 def test_read_single_node_allowed(client):
-    """You should be able to get a single condition node"""
+    """You should be able to get a single start node"""
 
     node_id = 1
     response = client.get(f"/start_nodes/{node_id}/")
@@ -75,7 +75,7 @@ def test_read_single_node_allowed(client):
 
 
 def test_delete_node_allowed(client):
-    """You should be able to delete a single condition node"""
+    """You should be able to delete a single start node"""
 
     node_id = 13
 

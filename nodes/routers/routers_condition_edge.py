@@ -38,6 +38,20 @@ def read_single_condition_edge(
     return db_condition_edge
 
 
+@router.post("/condition_edges/", response_model=schemas.ConditionEdgeCreate)
+def create_condition_edge_endpoint(
+    condition_edge: schemas.ConditionEdgeCreate,
+    db: CommonDB,
+) -> models.ConditionEdge:
+    """Endpoint for creating a condition edge"""
+
+    exceptions_for_condition_edge_router_403(edge=condition_edge, db=db)
+
+    return crud_condition_edge.create_condition_edge(
+        edge=condition_edge, db=db
+    )
+
+
 @router.put(
     "/condition_edges/{edge_id}",
     response_model=schemas.ConditionEdgeCreate,
