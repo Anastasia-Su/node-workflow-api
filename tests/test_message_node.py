@@ -13,7 +13,7 @@ def test_create_or_update_with_assigned_parent_node_forbidden(
         "status": MessageStatuses.PENDING,
         "text": "Test message node",
         "parent_node_id": 1,
-        "parent_condition_edge_id": 0,
+        "parent_condition_edge_id": None,
         "workflow_id": 1,
     }
 
@@ -36,7 +36,7 @@ def test_create_or_update_with_assigned_parent_condition_node_forbidden(
         "status": MessageStatuses.PENDING,
         "text": "Test message node",
         "parent_node_id": 9,
-        "parent_condition_edge_id": 0,
+        "parent_condition_edge_id": None,
         "workflow_id": 1,
     }
 
@@ -58,7 +58,7 @@ def test_create_or_update_for_different_workflow_forbidden(client):
         "status": MessageStatuses.PENDING,
         "text": "Test message node",
         "parent_node_id": 22,
-        "parent_condition_edge_id": 0,
+        "parent_condition_edge_id": None,
         "workflow_id": 2,
     }
 
@@ -82,7 +82,7 @@ def test_create_or_update_with_nonexistent_parent_id_forbidden(
         "status": MessageStatuses.PENDING,
         "text": "Test message node",
         "parent_node_id": 100,
-        "parent_condition_edge_id": 0,
+        "parent_condition_edge_id": None,
         "workflow_id": 2,
     }
 
@@ -105,8 +105,8 @@ def test_create_or_update_with_nonexistent_workflow_id_forbidden(
     new_node_data = {
         "status": MessageStatuses.PENDING,
         "text": "Test message node",
-        "parent_node_id": 0,
-        "parent_condition_edge_id": 0,
+        "parent_node_id": None,
+        "parent_condition_edge_id": None,
         "workflow_id": 100,
     }
 
@@ -130,7 +130,7 @@ def test_create_or_update_with_parent_of_wrong_type_forbidden(
         "status": MessageStatuses.PENDING,
         "text": "Test message node",
         "parent_node_id": 11,
-        "parent_condition_edge_id": 0,
+        "parent_condition_edge_id": None,
         "workflow_id": 1,
     }
 
@@ -152,8 +152,8 @@ def test_read_update_delete_with_nonexistent_id_forbidden(
     new_node_data = {
         "status": MessageStatuses.PENDING,
         "text": "Test message node",
-        "parent_node_id": 0,
-        "parent_condition_edge_id": 0,
+        "parent_node_id": None,
+        "parent_condition_edge_id": None,
         "workflow_id": 1,
     }
 
@@ -176,8 +176,8 @@ def test_create_or_update_with_null_parent_allowed(client):
     new_node_data = {
         "status": MessageStatuses.PENDING,
         "text": "Test message node",
-        "parent_node_id": 0,
-        "parent_condition_edge_id": 0,
+        "parent_node_id": None,
+        "parent_condition_edge_id": None,
         "workflow_id": 2,
     }
 

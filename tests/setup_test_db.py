@@ -4,8 +4,9 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy_utils import database_exists, create_database
 
-from load_mock_data import insert_mock_data
+from load_mock_data import insert_mock_data, truncate_tables
 from nodes import models
 
 from dependencies import get_db
@@ -13,30 +14,44 @@ from main import app
 
 
 def setup_db(engine, db):
+    print("Setting up the database...")
     models.Base.metadata.create_all(bind=engine)
     current_dir = os.path.dirname(__file__)
-    file_path = os.path.join(current_dir, "mock_db_for_tests.json")
+    file_path = os.path.join(current_dir, "mock_db_for_tests_.json")
     insert_mock_data(db, file_path)
+    db.commit()
 
 
 def teardown_test_db(engine):
-    models.Base.metadata.drop_all(bind=engine)
+    if models.Base.metadata.tables:
+        print("Tearing down the database...")
+        models.Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture(scope="module")
 def test_db():
-    SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+    # SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+    SQLALCHEMY_DATABASE_URL = f"{os.environ.get('MARIADB_ROOT')}/test"
+
     engine = create_engine(SQLALCHEMY_DATABASE_URL)
+
+    if not database_exists(engine.url):
+        create_database(engine.url)
 
     TestingSessionLocal = sessionmaker(
         autocommit=False, autoflush=False, bind=engine
     )
 
     db = TestingSessionLocal()
-    teardown_test_db(engine)
+
+    # models.Base.metadata.create_all(bind=engine)
+    # teardown_test_db(engine)
+    truncate_tables(db)
     setup_db(engine, db)
 
     yield db
+
+    engine.dispose()
 
 
 @pytest.fixture

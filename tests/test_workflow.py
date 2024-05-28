@@ -1,5 +1,3 @@
-from urllib import response
-
 from fastapi import status
 from tests.setup_test_db import client, test_db
 

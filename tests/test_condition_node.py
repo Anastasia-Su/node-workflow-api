@@ -11,7 +11,7 @@ def test_create_or_update_with_assigned_parent_node_forbidden(
     new_node_data = {
         "condition": "status == sent",
         "parent_node_id": 5,
-        "parent_message_node_id": 0,
+        "parent_message_node_id": None,
         "workflow_id": 1,
     }
 
@@ -33,7 +33,7 @@ def test_create_or_update_with_assigned_parent_condition_node_forbidden(
     new_node_data = {
         "condition": "status == sent",
         "parent_node_id": 9,
-        "parent_message_node_id": 0,
+        "parent_message_node_id": None,
         "workflow_id": 1,
     }
 
@@ -54,7 +54,7 @@ def test_create_or_update_for_different_workflow_forbidden(client):
     new_node_data = {
         "condition": "status == sent",
         "parent_node_id": 20,
-        "parent_message_node_id": 0,
+        "parent_message_node_id": None,
         "workflow_id": 2,
     }
 
@@ -77,7 +77,7 @@ def test_create_or_update_with_nonexistent_parent_id_forbidden(
     new_node_data = {
         "condition": "status == sent",
         "parent_node_id": 100,
-        "parent_message_node_id": 0,
+        "parent_message_node_id": None,
         "workflow_id": 1,
     }
 
@@ -99,7 +99,7 @@ def test_create_or_update_with_nonexistent_parent_message_id_forbidden(
 
     new_node_data = {
         "condition": "status == sent",
-        "parent_node_id": 0,
+        "parent_node_id": None,
         "parent_message_node_id": 100,
         "workflow_id": 1,
     }
@@ -122,8 +122,8 @@ def test_create_or_update_with_nonexistent_workflow_id_forbidden(
 
     new_node_data = {
         "condition": "status == sent",
-        "parent_node_id": 0,
-        "parent_message_node_id": 0,
+        "parent_node_id": None,
+        "parent_message_node_id": None,
         "workflow_id": 100,
     }
 
@@ -146,7 +146,7 @@ def test_create_or_update_with_parent_of_wrong_type_forbidden(
     new_node_data = {
         "condition": "status == sent",
         "parent_node_id": 22,
-        "parent_message_node_id": 0,
+        "parent_message_node_id": None,
         "workflow_id": 1,
     }
 
@@ -176,8 +176,8 @@ def test_read_update_delete_with_nonexistent_id_forbidden(
     node_id = 100
     new_node_data = {
         "condition": "status == sent",
-        "parent_node_id": 0,
-        "parent_message_node_id": 0,
+        "parent_node_id": None,
+        "parent_message_node_id": None,
         "workflow_id": 1,
     }
 
@@ -199,8 +199,8 @@ def test_create_or_update_with_null_parent_allowed(client):
     node_id = 21
     new_node_data = {
         "condition": "status == sent",
-        "parent_node_id": 0,
-        "parent_message_node_id": 0,
+        "parent_node_id": None,
+        "parent_message_node_id": None,
         "workflow_id": 2,
     }
 

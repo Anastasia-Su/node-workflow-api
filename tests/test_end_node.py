@@ -142,8 +142,8 @@ def test_create_or_update_with_null_parent_allowed(client):
     node_id = 19
     new_node_data = {
         "message": "end",
-        "parent_node_id": 0,
-        "workflow_id": 0,
+        "parent_node_id": None,
+        "workflow_id": None,
     }
 
     response_create = client.post("/end_nodes/", json=new_node_data)

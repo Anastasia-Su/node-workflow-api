@@ -5,6 +5,7 @@ import sys
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy_utils import database_exists, create_database
 
 from database import Base
 from nodes import models
@@ -41,6 +42,7 @@ def insert_mock_data(db, file_name):
         for w_data in workflows:
             workflow = models.Workflow(id=w_data["id"], name=w_data["name"])
             db.add(workflow)
+            db.commit()
 
         for edge_data in condition_edges:
             c_edge = models.ConditionEdge(
@@ -58,6 +60,7 @@ def insert_mock_data(db, file_name):
                 workflow_id=start_node_data["workflow_id"],
             )
             db.add(start_node)
+            db.commit()
 
         for message_node_data in message_nodes:
             message_node = models.MessageNode(
@@ -71,6 +74,7 @@ def insert_mock_data(db, file_name):
                 workflow_id=message_node_data["workflow_id"],
             )
             db.add(message_node)
+            db.commit()
 
         for condition_node_data in condition_nodes:
             condition_node = models.ConditionNode(
@@ -83,6 +87,7 @@ def insert_mock_data(db, file_name):
                 workflow_id=condition_node_data["workflow_id"],
             )
             db.add(condition_node)
+            db.commit()
 
         for end_node_data in end_nodes:
             end_node = models.EndNode(
@@ -92,6 +97,7 @@ def insert_mock_data(db, file_name):
                 workflow_id=end_node_data["workflow_id"],
             )
             db.add(end_node)
+            db.commit()
 
     db.commit()
 
@@ -101,6 +107,20 @@ if __name__ == "__main__":
 
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
+
+    # SQLALCHEMY_DATABASE_URL = f"{os.environ.get('MARIADB_DATABASE_ROOT')}/test"
+    #
+    # engine = create_engine(SQLALCHEMY_DATABASE_URL)
+    #
+    # if not database_exists(engine.url):
+    #     create_database(engine.url)
+    #
+    # TestingSessionLocal = sessionmaker(
+    #     autocommit=False, autoflush=False, bind=engine
+    # )
+    # Base.metadata.create_all(bind=engine)
+    #
+    # db = TestingSessionLocal()
 
     try:
         truncate_tables(db)

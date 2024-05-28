@@ -1,11 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
+from sqlalchemy.exc import IntegrityError
 
 from dependencies import CommonDB
 from nodes import models, schemas
 from nodes.crud import crud_start
 from nodes.routers.exceptions_for_routers.exceptions import (
     exceptions_for_router_404,
-    workflow_not_found_exception,
     exceptions_for_start_router_403,
 )
 
@@ -53,11 +53,19 @@ def update_start_node_endpoint(
 ) -> type(models.StartNode):
     """Endpoint for updating a start node"""
 
-    db_node = crud_start.update_start_node(
-        db=db,
-        node_id=node_id,
-        new_node=node,
-    )
+    try:
+        db_node = crud_start.update_start_node(
+            db=db,
+            node_id=node_id,
+            new_node=node,
+        )
+
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Integrity error. Please check workflow id.",
+        )
 
     exceptions_for_router_404(db_node=db_node, node_id=node_id)
     exceptions_for_start_router_403(start_node=node, db=db)

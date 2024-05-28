@@ -20,6 +20,104 @@
      }
     ]
  },
+  {
+   "start_nodes": [
+     {
+     "id": 1,
+     "message": "Start workflow 1",
+     "workflow_id": 1
+     },
+     {
+     "id": 2,
+     "message": "Start workflow 2",
+     "workflow_id": 2
+     },
+     {
+     "id": 13,
+     "message": "Start workflow 3",
+     "workflow_id": 3
+     },
+     {
+     "id": 22,
+     "message": "Start workflow 1 another",
+     "workflow_id": 1
+     }
+   ]
+ },
+  {
+   "message_nodes": [
+     {
+       "id": 3,
+       "status": "OPEN",
+       "text": "Open status message node",
+       "parent_node_id": 1,
+       "parent_condition_edge_id": null,
+       "workflow_id": 1
+     },
+     {
+       "id": 4,
+       "status": "SENT",
+       "text": "Sent status message node",
+       "parent_node_id": 2,
+       "parent_condition_edge_id": null,
+       "workflow_id": 2
+     },
+     {
+       "id": 14,
+       "status": "OPEN",
+       "text": "Open status message node",
+       "parent_node_id": 4,
+       "parent_condition_edge_id": null,
+       "workflow_id": 2
+     }
+   ]
+  },
+  {
+   "condition_nodes": [
+     {
+       "id": 8,
+       "condition": "status == SENT",
+       "parent_node_id": 3,
+       "parent_message_node_id": 3,
+       "workflow_id": 1
+     },
+     {
+       "id": 9,
+       "condition": "status == OPEN",
+       "parent_node_id": 8,
+       "parent_message_node_id": 3,
+       "workflow_id": 1
+     },
+     {
+       "id": 15,
+       "condition": "status == SENT",
+       "parent_node_id": 14,
+       "parent_message_node_id": 14,
+       "workflow_id": 2
+     },
+     {
+       "id": 16,
+       "condition": "status == OPEN",
+       "parent_node_id": 15,
+       "parent_message_node_id": 14,
+       "workflow_id": 2
+     },
+     {
+       "id": 21,
+       "condition": "status == OPEN",
+       "parent_node_id": null,
+       "parent_message_node_id": null,
+       "workflow_id": 2
+     },
+     {
+       "id": 23,
+       "condition": "status == OPEN",
+       "parent_node_id": null,
+       "parent_message_node_id": null,
+       "workflow_id": 1
+     }
+   ]
+ },
  {
    "condition_edges":
     [
@@ -65,61 +163,14 @@
      },
       {
        "id": 9,
-       "condition_node_id": 0,
+       "condition_node_id": null,
        "edge": "NO"
      }
     ]
   },
- {
-   "start_nodes": [
-     {
-     "id": 1,
-     "message": "Start workflow 1",
-     "workflow_id": 1
-     },
-     {
-     "id": 2,
-     "message": "Start workflow 2",
-     "workflow_id": 2
-     },
-     {
-     "id": 13,
-     "message": "Start workflow 3",
-     "workflow_id": 3
-     },
-     {
-     "id": 22,
-     "message": "Start workflow 1 another",
-     "workflow_id": 1
-     }
-   ]
- },
+
  {
    "message_nodes": [
-     {
-       "id": 3,
-       "status": "OPEN",
-       "text": "Open status message node",
-       "parent_node_id": 1,
-       "parent_condition_edge_id": null,
-       "workflow_id": 1
-     },
-     {
-       "id": 4,
-       "status": "SENT",
-       "text": "Sent status message node",
-       "parent_node_id": 2,
-       "parent_condition_edge_id": null,
-       "workflow_id": 2
-     },
-     {
-       "id": 14,
-       "status": "SENT",
-       "text": "Open status message node",
-       "parent_node_id": 4,
-       "parent_condition_edge_id": null,
-       "workflow_id": 2
-     },
      {
        "id": 17,
        "status": "PENDING",
@@ -128,8 +179,6 @@
        "parent_condition_edge_id": 5,
        "workflow_id": 2
      },
-
-
      {
        "id": 5,
        "status": "PENDING",
@@ -158,58 +207,13 @@
        "id": 20,
        "status": "PENDING",
        "text": "Sent: yes",
-       "parent_node_id": 0,
+       "parent_node_id": null,
        "parent_condition_edge_id": null,
        "workflow_id": 1
      }
    ]
  },
- {
-   "condition_nodes": [
-     {
-       "id": 8,
-       "condition": "status == SENT",
-       "parent_node_id": 3,
-       "parent_message_node_id": 3,
-       "workflow_id": 1
-     },
-     {
-       "id": 9,
-       "condition": "status == OPEN",
-       "parent_node_id": 8,
-       "parent_message_node_id": 3,
-       "workflow_id": 1
-     },
-     {
-       "id": 15,
-       "condition": "status == SENT",
-       "parent_node_id": 14,
-       "parent_message_node_id": 14,
-       "workflow_id": 2
-     },
-     {
-       "id": 16,
-       "condition": "status == OPEN",
-       "parent_node_id": 15,
-       "parent_message_node_id": 14,
-       "workflow_id": 2
-     },
-     {
-       "id": 21,
-       "condition": "status == OPEN",
-       "parent_node_id": 0,
-       "parent_message_node_id": 0,
-       "workflow_id": 2
-     },
-     {
-       "id": 23,
-       "condition": "status == OPEN",
-       "parent_node_id": 0,
-       "parent_message_node_id": 0,
-       "workflow_id": 1
-     }
-   ]
- },
+
  {
    "end_nodes":
     [
@@ -240,7 +244,7 @@
       {
        "id": 19,
        "message": "End",
-       "parent_node_id": 0,
+       "parent_node_id": null,
        "workflow_id": 2
      }
     ]
