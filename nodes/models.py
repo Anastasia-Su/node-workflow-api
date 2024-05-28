@@ -7,6 +7,7 @@ from sqlalchemy import (
     ForeignKey,
     Enum,
     ForeignKeyConstraint,
+    Sequence,
 )
 from sqlalchemy.orm import relationship
 
@@ -34,7 +35,7 @@ class ConditionEdges(StrEnum):
 
 class Node(Base):
     __tablename__ = "node"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     node_type = Column(Enum(NodeTypes))
 
     __mapper_args__ = {
@@ -46,9 +47,14 @@ class Node(Base):
 class ConditionEdge(Base):
     __tablename__ = "condition_edge"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True)
     condition_node_id = Column(
-        Integer, ForeignKey("condition.id", use_alter=True)
+        Integer,
+        ForeignKey(
+            "condition.id",
+            use_alter=True,
+            ondelete="CASCADE",
+        ),
     )
     edge = Column(Enum(ConditionEdges))
 
@@ -64,8 +70,7 @@ class StartNode(Node):
     )
 
     workflow = relationship(
-        "Workflow",
-        back_populates="start_node",
+        "Workflow", back_populates="start_node", passive_deletes=True
     )
 
     __mapper_args__ = {
@@ -85,7 +90,7 @@ class MessageNode(Node):
     )
     parent_condition_edge_id = Column(
         Integer,
-        ForeignKey("condition_edge.id", ondelete="SET NULL"),
+        ForeignKey("condition_edge.id", ondelete="CASCADE"),
         nullable=True,
     )
 
@@ -93,8 +98,7 @@ class MessageNode(Node):
         Integer, ForeignKey("workflow.id", ondelete="SET NULL"), nullable=True
     )
     workflow = relationship(
-        "Workflow",
-        back_populates="message_nodes",
+        "Workflow", back_populates="message_nodes", passive_deletes=True
     )
 
     __mapper_args__ = {
@@ -116,15 +120,20 @@ class ConditionNode(Node):
         Integer, ForeignKey("message.id", ondelete="SET NULL"), nullable=True
     )
 
-    edge = relationship("ConditionEdge", uselist=False, backref="condition")
+    edge = relationship(
+        "ConditionEdge",
+        uselist=False,
+        backref="condition",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
 
     workflow_id = Column(
         Integer, ForeignKey("workflow.id", ondelete="SET NULL"), nullable=True
     )
 
     workflow = relationship(
-        "Workflow",
-        back_populates="condition_nodes",
+        "Workflow", back_populates="condition_nodes", passive_deletes=True
     )
 
     __mapper_args__ = {
@@ -149,8 +158,7 @@ class EndNode(Node):
     )
 
     workflow = relationship(
-        "Workflow",
-        back_populates="end_nodes",
+        "Workflow", back_populates="end_nodes", passive_deletes=True
     )
 
     __mapper_args__ = {

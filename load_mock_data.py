@@ -18,6 +18,13 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
+def truncate_tables(db):
+    meta = Base.metadata
+    for table in reversed(meta.sorted_tables):
+        db.execute(table.delete())
+    db.commit()
+
+
 def insert_mock_data(db, file_name):
     with open(file_name, "r") as f:
         mock_data = json.load(f)
@@ -41,6 +48,7 @@ def insert_mock_data(db, file_name):
                 edge=edge_data["edge"],
             )
             db.add(c_edge)
+            db.commit()
 
         for start_node_data in start_nodes:
             start_node = models.StartNode(
@@ -94,19 +102,9 @@ if __name__ == "__main__":
     db = SessionLocal()
 
     try:
-        insert_mock_data(db, filename)
+        truncate_tables(db)
+        # insert_mock_data(db, filename)
         print("Mock data loaded successfully.")
+
     finally:
         db.close()
-    # transaction = db.begin()
-    #
-    # try:
-    #     insert_mock_data(db, filename)
-    #     transaction.commit()
-    #     print("Mock data loaded successfully.")
-    # except Exception as e:
-    #     transaction.rollback()
-    #     print(f"Error loading mock data: {e}")
-    # finally:
-    #     db.close()
-    # print("Mock data loaded successfully.")
