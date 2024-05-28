@@ -66,7 +66,10 @@ class StartNode(Node):
     message = Column(String(255), nullable=True)
 
     workflow_id = Column(
-        Integer, ForeignKey("workflow.id", ondelete="SET NULL"), nullable=True
+        Integer,
+        ForeignKey("workflow.id", ondelete="SET NULL"),
+        nullable=True,
+        default=None,
     )
 
     workflow = relationship(
@@ -86,16 +89,23 @@ class MessageNode(Node):
     text = Column(String(511), nullable=False)
 
     parent_node_id = Column(
-        Integer, ForeignKey("node.id", ondelete="SET NULL"), nullable=True
+        Integer,
+        ForeignKey("node.id", ondelete="SET NULL"),
+        nullable=True,
+        default=None,
     )
     parent_condition_edge_id = Column(
         Integer,
         ForeignKey("condition_edge.id", ondelete="CASCADE"),
         nullable=True,
+        default=None,
     )
 
     workflow_id = Column(
-        Integer, ForeignKey("workflow.id", ondelete="SET NULL"), nullable=True
+        Integer,
+        ForeignKey("workflow.id", ondelete="SET NULL"),
+        nullable=True,
+        default=None,
     )
     workflow = relationship(
         "Workflow", back_populates="message_nodes", passive_deletes=True
@@ -111,13 +121,19 @@ class ConditionNode(Node):
     __tablename__ = "condition"
 
     id = Column(Integer, ForeignKey("node.id"), primary_key=True)
-    condition = Column(String, nullable=False)
+    condition = Column(String(255), nullable=False)
 
     parent_node_id = Column(
-        Integer, ForeignKey("node.id", ondelete="SET NULL"), nullable=True
+        Integer,
+        ForeignKey("node.id", ondelete="SET NULL"),
+        nullable=True,
+        default=None,
     )
     parent_message_node_id = Column(
-        Integer, ForeignKey("message.id", ondelete="SET NULL"), nullable=True
+        Integer,
+        ForeignKey("message.id", ondelete="SET NULL"),
+        nullable=True,
+        default=None,
     )
 
     edge = relationship(
@@ -129,7 +145,10 @@ class ConditionNode(Node):
     )
 
     workflow_id = Column(
-        Integer, ForeignKey("workflow.id", ondelete="SET NULL"), nullable=True
+        Integer,
+        ForeignKey("workflow.id", ondelete="SET NULL"),
+        nullable=True,
+        default=None,
     )
 
     workflow = relationship(
@@ -150,11 +169,17 @@ class EndNode(Node):
     message = Column(String(255), nullable=True)
 
     parent_node_id = Column(
-        Integer, ForeignKey("message.id", ondelete="SET NULL"), nullable=True
+        Integer,
+        ForeignKey("message.id", ondelete="SET NULL"),
+        nullable=True,
+        default=None,
     )
 
     workflow_id = Column(
-        Integer, ForeignKey("workflow.id", ondelete="SET NULL"), nullable=True
+        Integer,
+        ForeignKey("workflow.id", ondelete="SET NULL"),
+        nullable=True,
+        default=None,
     )
 
     workflow = relationship(

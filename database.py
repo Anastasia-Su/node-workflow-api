@@ -8,8 +8,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# SQLALCHEMY_DATABASE_URL = "sqlite:///./node-workflow.db"
-SQLALCHEMY_DATABASE_URL = os.environ["SQLALCHEMY_DATABASE_URL"]
+# SQLALCHEMY_DATABASE_URL = os.environ["SQLITE_DATABASE_URL"]
+SQLALCHEMY_DATABASE_URL = os.environ["MARIADB_DATABASE_URL"]
 
 # engine = create_engine(
 #     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}

@@ -66,6 +66,7 @@ def existing_child_exception(
             if (
                 existing_message_child
                 and node.parent_node_id != 0
+                and node.parent_node_id is not None
                 and existing_message_child.id != node_id
             ):
                 raise HTTPException(
@@ -105,6 +106,7 @@ def existing_two_children_exception(
                 existing_message_children
                 and total_children >= 2
                 and node.parent_node_id != 0
+                and node.parent_node_id is not None
                 and node_id
                 not in [child.id for child in existing_message_children]
             ):
@@ -128,7 +130,11 @@ def workflow_not_found_exception(
         .first()
     )
 
-    if node.workflow_id != 0 and not existing_workflow:
+    if (
+        node.workflow_id != 0
+        and node.workflow_id is not None
+        and not existing_workflow
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Workflow with id {node.workflow_id} not found.",
@@ -143,8 +149,11 @@ def different_workflow_exception(
     if parent_node:
         if (
             parent_node.workflow_id != 0
+            and parent_node.workflow_id is not None
             and node.workflow_id != 0
+            and node.workflow_id is not None
             and parent_node_id != 0
+            and parent_node_id is not None
             and node.workflow_id != parent_node.workflow_id
         ):
             raise HTTPException(
@@ -162,7 +171,11 @@ def exception_for_wrong_ref_id(
 ) -> None:
     """Raise an exception when a parent or reference node not found."""
 
-    if parent_node_id != 0 and parent_node is None:
+    if (
+        parent_node_id != 0
+        and parent_node_id is not None
+        and parent_node is None
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Parent node with id {parent_node_id} not found",

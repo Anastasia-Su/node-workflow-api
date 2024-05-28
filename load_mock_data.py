@@ -11,8 +11,9 @@ from nodes import models
 
 load_dotenv()
 
-# SQLALCHEMY_DATABASE_URL = "sqlite:///./node-workflow.db"
-SQLALCHEMY_DATABASE_URL = os.environ["SQLALCHEMY_DATABASE_URL"]
+# SQLALCHEMY_DATABASE_URL = os.environ["SQLITE_DATABASE_URL"]
+SQLALCHEMY_DATABASE_URL = os.environ["MARIADB_DATABASE_URL"]
+
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -103,7 +104,7 @@ if __name__ == "__main__":
 
     try:
         truncate_tables(db)
-        # insert_mock_data(db, filename)
+        insert_mock_data(db, filename)
         print("Mock data loaded successfully.")
 
     finally:
