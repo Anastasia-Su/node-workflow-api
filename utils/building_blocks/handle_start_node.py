@@ -39,7 +39,8 @@ def handle_start_node(
         exception_no_next_node(current_node=current_node)
 
     # Assign random status to simulate status update in workflow.
-    # You can remove this block, or substitute it with your status changing logic.
+    # You can remove this block,
+    # or substitute it with your status changing logic.
     next_node.status = random.choice(list(MessageStatuses))
     db.commit()
     db.refresh(next_node)

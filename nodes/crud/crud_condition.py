@@ -8,7 +8,8 @@ def get_condition_node_list(
     parent_message_node_id: int | None = None,
     condition: str | None = None,
 ) -> list[type(models.ConditionNode)]:
-    """Retrieve all condition nodes with the option to filter by parent_message_id and condition"""
+    """Retrieve all condition nodes
+    with the option to filter by parent_message_id and condition"""
 
     condition_nodes = db.query(models.ConditionNode)
 

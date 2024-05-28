@@ -16,7 +16,8 @@ NodeTypeAlias = Union[
 def exception_no_next_node(current_node: NodeTypeAlias) -> None:
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"No associated node found for current node with id {current_node.id}",
+        detail=f"No associated node found for current node"
+        f" with id {current_node.id}",
     )
 
 
@@ -41,7 +42,9 @@ def exception_for_infinite_loop(
     if iteration_count >= num_of_iterations:
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
-            detail=f"Reached maximum iterations: {num_of_iterations}, possible infinite loop detected",
+            detail=f"Reached maximum iterations: "
+            f"{num_of_iterations}, "
+            f"possible infinite loop detected",
         )
 
 

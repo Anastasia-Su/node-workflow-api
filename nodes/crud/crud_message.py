@@ -9,7 +9,8 @@ def get_message_node_list(
     text: str | None = None,
     message_status: MessageStatuses | None = None,
 ) -> list[type(models.MessageNode)]:
-    """Retrieve all message nodes with the option to filter by text and status"""
+    """Retrieve all message nodes
+    with the option to filter by text and status"""
 
     message_nodes = db.query(models.MessageNode)
 

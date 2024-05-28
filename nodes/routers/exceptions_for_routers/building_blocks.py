@@ -26,7 +26,8 @@ def wrong_parent_exception(
     if parent_node and parent_node.node_type == node_type:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Parent {attribute} can't be of type {parent_node.node_type.upper()}",
+            detail=f"Parent {attribute} can't be of type"
+            f" {parent_node.node_type.upper()}",
         )
 
 
@@ -38,7 +39,8 @@ def existing_child_exception(
     db: CommonDB,
     node_id: int | None = None,
 ) -> None:
-    """Raise an exception if parent message or start node already has a child node"""
+    """Raise an exception if parent message
+    or start node already has a child node"""
 
     exception_models = [
         models.MessageNode,
@@ -71,7 +73,8 @@ def existing_child_exception(
             ):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f"Parent node with id {node.parent_node_id} already has a child node with id "
+                    detail=f"Parent node with id {node.parent_node_id} "
+                    f"already has a child node with id "
                     f"{existing_message_child.id}.",
                 )
 
@@ -84,7 +87,8 @@ def existing_two_children_exception(
     db: CommonDB,
     node_id: int | None = None,
 ) -> None:
-    """Raise an exception if parent condition node already has two child nodes"""
+    """Raise an exception if parent condition node
+    already has two child nodes"""
 
     exception_models = [models.MessageNode, models.ConditionNode]
 
@@ -112,7 +116,8 @@ def existing_two_children_exception(
             ):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f"Parent node with id {node.parent_node_id} already has two child nodes.",
+                    detail=f"Parent node with id {node.parent_node_id} "
+                    f"already has two child nodes.",
                 )
 
 
@@ -187,7 +192,8 @@ def exception_if_more_than_one_node(
     models_node: type(models.StartNode) | type(models.EndNode),
     db: CommonDB,
 ) -> None:
-    """Raise an exception when specified workflow already has a node of this type"""
+    """Raise an exception when specified workflow
+    already has a node of this type"""
 
     existing_node = (
         db.query(models_node)
@@ -200,5 +206,6 @@ def exception_if_more_than_one_node(
     if existing_node:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"This workflow already has {models_node().node_type.upper()} node",
+            detail=f"This workflow already has "
+            f"{models_node().node_type.upper()} node",
         )

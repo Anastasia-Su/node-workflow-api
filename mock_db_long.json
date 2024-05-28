@@ -186,19 +186,19 @@
        "id": 10,
        "message": "End, if sent: yes",
        "parent_node_id": 7,
-       "workflow_id": 1
+       "workflow_id": 2
      },
      {
        "id": 11,
        "message": "End, if open: yes",
        "parent_node_id": 5,
-       "workflow_id": 1
+       "workflow_id": 2
      },
         {
        "id": 12,
        "message": "End, if open: no",
        "parent_node_id": 6,
-       "workflow_id": 1
+       "workflow_id": 2
      },
       {
        "id": 19,

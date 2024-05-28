@@ -62,7 +62,8 @@ def handle_message_node(
             )
             if next_node:
                 # Assign random status to simulate status update in workflow.
-                # You can remove this line, or substitute it with your status changing logic.
+                # You can remove this line,
+                # or substitute it with your status changing logic.
                 next_node.status = random.choice(list(MessageStatuses))
                 next_node.parent_node_id = current_node.id
                 db.commit()
