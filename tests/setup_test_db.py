@@ -22,15 +22,8 @@ def setup_db(engine, db):
     db.commit()
 
 
-def teardown_test_db(engine):
-    if models.Base.metadata.tables:
-        print("Tearing down the database...")
-        models.Base.metadata.drop_all(bind=engine)
-
-
 @pytest.fixture(scope="module")
 def test_db():
-    # SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
     SQLALCHEMY_DATABASE_URL = f"{os.environ.get('MARIADB_TESTING_URL')}"
 
     engine = create_engine(SQLALCHEMY_DATABASE_URL)
@@ -44,8 +37,6 @@ def test_db():
 
     db = TestingSessionLocal()
 
-    # models.Base.metadata.create_all(bind=engine)
-    # teardown_test_db(engine)
     truncate_tables(db)
     setup_db(engine, db)
 
