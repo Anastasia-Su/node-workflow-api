@@ -7,10 +7,8 @@ services:
             - "8000:8000"
         volumes:
             - ./:/app
-        command: >
-            sh -c "
-            alembic upgrade head
-            && python -m uvicorn main:app"
+        command: ["sh", "-c", "./wait_for_it.sh db:3306 -- ./start.sh"]
+
         env_file:
             - .env
         depends_on:

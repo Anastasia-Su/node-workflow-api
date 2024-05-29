@@ -14,3 +14,5 @@ COPY . .
 
 RUN mkdir -p /vol/web/media
 RUN chmod -R 755 /vol/web/
+
+CMD ["./start.sh"]

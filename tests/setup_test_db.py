@@ -31,7 +31,7 @@ def teardown_test_db(engine):
 @pytest.fixture(scope="module")
 def test_db():
     # SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-    SQLALCHEMY_DATABASE_URL = f"{os.environ.get('MARIADB_ROOT')}/test"
+    SQLALCHEMY_DATABASE_URL = f"{os.environ.get('MARIADB_TESTING_URL')}"
 
     engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
