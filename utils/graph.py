@@ -66,5 +66,7 @@ def build_graph(G: nx.DiGraph) -> None:
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=14)
 
     plt.show()
+
+    # Uncomment this string, if you want to save the graph.
     # plt.savefig("workflow_graph.png", bbox_inches="tight")
     plt.close()
