@@ -41,7 +41,7 @@ def test_read_update_delete_with_nonexistent_id_forbidden(
 
 def test_read_edges_allowed(client):
     """You should be able to get all edges"""
-    response = client.get(f"/condition_edges/")
+    response = client.get("/condition_edges/")
 
     assert response.status_code == status.HTTP_200_OK
 

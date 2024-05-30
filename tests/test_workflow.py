@@ -25,7 +25,7 @@ def test_read_update_delete_with_nonexistent_id_forbidden(
 
 def test_read_workflows_allowed(client):
     """You should be able to get all workflows"""
-    response = client.get(f"/workflows/")
+    response = client.get("/workflows/")
 
     assert response.status_code == status.HTTP_200_OK
 

@@ -20,7 +20,7 @@ def build_graph(G: nx.DiGraph) -> None:
         if "message" in data:
             label_parts.append(f"Message: {data['message']}")
         if "status" in data:
-            label_parts.append(f"Status: {data['status']}")
+            label_parts.append(f"Status: {data['status'].upper()}")
             label_parts.append(f"Text: {data['text']}")
 
         if "condition" in data:

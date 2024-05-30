@@ -1,6 +1,5 @@
 from typing import Annotated
 from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from database import SessionLocal
@@ -15,7 +14,7 @@ def get_db() -> Session:
         db.close()
 
 
-def common_db(db: Session = Depends(get_db)):
+def common_db(db: Session = Depends(get_db)) -> Session:
     return db
 
 

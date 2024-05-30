@@ -5,7 +5,8 @@ from tests.setup_test_db import client, test_db
 def test_create_or_update_with_assigned_parent_node_forbidden(
     client,
 ):
-    """Message node can have only one child. So you can't specify id for already taken parent node"""
+    """Message node can have only one child.
+    So you can't specify id for already taken parent node"""
 
     node_id = 8
     new_node_data = {
@@ -27,7 +28,8 @@ def test_create_or_update_with_assigned_parent_node_forbidden(
 def test_create_or_update_with_assigned_parent_condition_node_forbidden(
     client,
 ):
-    """Condition node can have only two children. So you can't specify id for already taken parent node"""
+    """Condition node can have only two children.
+    So you can't specify id for already taken parent node"""
 
     node_id = 8
     new_node_data = {
@@ -194,7 +196,8 @@ def test_read_update_delete_with_nonexistent_id_forbidden(
 
 
 def test_create_or_update_with_null_parent_allowed(client):
-    """You should be able to set null parent_node_id, so that you can assign it in future"""
+    """You should be able to set null parent_node_id,
+    so that you can assign it in future"""
 
     node_id = 21
     new_node_data = {
@@ -215,7 +218,7 @@ def test_create_or_update_with_null_parent_allowed(client):
 
 def test_read_nodes_allowed(client):
     """You should be able to get all condition nodes"""
-    response = client.get(f"/condition_nodes/")
+    response = client.get("/condition_nodes/")
 
     assert response.status_code == status.HTTP_200_OK
 

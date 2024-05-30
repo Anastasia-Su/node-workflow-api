@@ -104,21 +104,30 @@ Choose if you want to draw graph, using dropdown menu.
 you can choose different layout or choose to save a graph to your files.
 3. If you would like to test workflow execution without creating it, you can load mock data.  
 Type in the terminal: `load_mock_data.py mock_db.json` to test the above algorithm.  
-Or type: `load_mock_data.py mock_db_long.json` to test the algorithm, shown below.
+Or type: `load_mock_data.py mock_db_long.json` to test the algorithm, shown below.  
+If you prefer using SQLite, change URL to SQLITE_DATABASE_URL in `load_mock_data.py`.
 4. You may notice that each time workflow runs, you get different incoming messages.  
 This behavior is the result of using `random.choice`. It is intended to simulate status change in a network.  
 You can delete it or substitute with your logic, if you want. To do it, follow comments in these files:  
 `utils/building_blocks/handle_start_node.py` and `utils/building_blocks/handle_message_node.py`.  
+
+
+Here is an example algorithm for building a longer workflow: 
+
+![Diagram](images/long_diagram.drawio.png)  
   
-
-![Diagram](images/long_diagram.drawio.png)
-
+Workflow construction process is almost the same.  
+When you add incoming message node for the second round, you may indicate id for any parent response message node.  
+Respective id will be placed automatically depending on you current workflow result.  
+The resulting graph, when the first incoming message is `open` and the second one is `sent`, will be the following:  
+  
+![Diagram](images/workflow_graph_long_open_sent.png)  
 
 ## Instructions for running tests
 
 `Tests` python package includes file `setup_test_db.py`. By default, it creates MariaDB testing database and loads mock data for testing.  
 But if you prefer using SQLite, change URL to SQLITE_DATABASE_URL.   
-To run tests, just type `pytest -vv`
+To run tests, just type `pytest -vv`.
 
 
 ## Links

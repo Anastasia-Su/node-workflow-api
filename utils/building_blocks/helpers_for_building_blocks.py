@@ -1,7 +1,5 @@
-from typing import Union, Any
-
+from typing import Union
 from fastapi import HTTPException, status
-
 from nodes import models
 
 

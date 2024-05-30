@@ -24,6 +24,7 @@ def setup_db(engine, db):
 
 @pytest.fixture(scope="module")
 def test_db():
+    # SQLALCHEMY_DATABASE_URL = f"{os.environ.get('SQLITE_DATABASE_URL')}"
     SQLALCHEMY_DATABASE_URL = f"{os.environ.get('MARIADB_TESTING_URL')}"
 
     engine = create_engine(SQLALCHEMY_DATABASE_URL)

@@ -21,6 +21,8 @@ from utils.graph import build_graph
 def execute_workflow(
     db: CommonDB, workflow_id: int, draw_graph: bool = True
 ) -> dict[str, DiGraph | float]:
+    """Execute workflow function:
+    it gets all nodes for the current workflow and navigates them"""
 
     workflow_node = crud_workflow.get_workflow_detail(
         db=db, node_id=workflow_id
@@ -34,6 +36,9 @@ def execute_workflow(
     current_node = start_node
     G = nx.DiGraph()
     iteration_count = 0
+
+    # `num_of_iterations` is added to prevent infinite loop error.
+    # Adjust the number if your workflow is longer.
     num_of_iterations = 50
     start = time.time()
 

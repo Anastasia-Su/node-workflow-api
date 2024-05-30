@@ -1,7 +1,4 @@
-from enum import StrEnum
-from typing import Optional
-
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
 
 from nodes.models import MessageStatuses, ConditionEdges
 

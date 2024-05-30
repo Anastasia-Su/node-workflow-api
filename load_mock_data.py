@@ -5,7 +5,6 @@ import sys
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy_utils import database_exists, create_database
 
 from database import Base
 from nodes import models
@@ -20,14 +19,14 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-def truncate_tables(db):
+def truncate_tables(db: SessionLocal) -> None:
     meta = Base.metadata
     for table in reversed(meta.sorted_tables):
         db.execute(table.delete())
     db.commit()
 
 
-def insert_mock_data(db, file_name):
+def insert_mock_data(db: SessionLocal, file_name: str) -> None:
     with open(file_name, "r") as f:
         mock_data = json.load(f)
 

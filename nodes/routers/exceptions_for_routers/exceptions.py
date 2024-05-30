@@ -1,6 +1,5 @@
 from typing import Union
 from fastapi import HTTPException, status
-from sqlalchemy.orm import joinedload
 
 from dependencies import CommonDB
 from nodes import schemas, models
@@ -21,6 +20,13 @@ NodeTypeAlias = Union[
     schemas.StartNodeCreate,
     schemas.ConditionNodeCreate,
     schemas.EndNodeCreate,
+]
+
+NodeTypeCreatedAlias = Union[
+    schemas.MessageNode,
+    schemas.StartNode,
+    schemas.ConditionNode,
+    schemas.EndNode,
 ]
 
 
@@ -209,7 +215,7 @@ def exceptions_for_end_router_403(
 
 def exceptions_for_start_router_403(
     start_node: schemas.StartNodeCreate, db: CommonDB
-):
+) -> None:
     """Combine exceptions from the functions:
     workflow_not_found_exception,
     exception_if_more_than_one_node,"""
@@ -220,7 +226,9 @@ def exceptions_for_start_router_403(
     )
 
 
-def exceptions_for_router_404(db_node, node_id) -> None:
+def exceptions_for_router_404(
+    db_node: NodeTypeCreatedAlias, node_id: int
+) -> None:
     """Raise exception if the specified node is not found"""
 
     if db_node is None:

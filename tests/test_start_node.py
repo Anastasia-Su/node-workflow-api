@@ -41,7 +41,7 @@ def test_read_update_delete_with_nonexistent_id_forbidden(
 
 def test_read_nodes_allowed(client):
     """You should be able to get all start nodes"""
-    response = client.get(f"/start_nodes/")
+    response = client.get("/start_nodes/")
 
     assert response.status_code == status.HTTP_200_OK
 
