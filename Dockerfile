@@ -4,7 +4,7 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR app/
 COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 RUN apt-get update  \
     && apt-get install -y --no-install-recommends ca-certificates \
     && apt-get clean \
@@ -12,7 +12,7 @@ RUN apt-get update  \
 
 COPY . .
 
-RUN mkdir -p /vol/web/media
-RUN chmod -R 755 /vol/web/
+RUN mkdir -p /vol/web/media && \
+    chmod -R 755 /vol/web/
 
-CMD ["./start.sh"]
+CMD ["sh", "-c", "./wait_for_it.sh db:3306 -- ./start.sh"]
