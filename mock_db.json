@@ -1,0 +1,146 @@
+[
+  {
+   "workflows":
+    [
+      {
+       "id": 1,
+       "name": "Workflow 1"
+     },
+      {
+       "id": 2,
+       "name": "Workflow 2"
+     }
+    ]
+ },
+ {
+   "start_nodes": [
+     {
+     "id": 1,
+     "message": "Start workflow 1",
+     "workflow_id": 1
+     },
+     {
+     "id": 2,
+     "message": "Start workflow 2",
+     "workflow_id": 2
+     }
+   ]
+ },
+  {
+    "message_nodes": [
+      {
+        "id": 3,
+        "status": "OPEN",
+        "text": "Open status message node",
+        "parent_node_id": 1,
+        "parent_condition_edge_id": null,
+        "workflow_id": 1
+      }
+    ]
+  },
+  {
+   "condition_nodes": [
+     {
+       "id": 8,
+       "condition": "status == SENT",
+       "parent_node_id": 3,
+       "parent_message_node_id": 3,
+       "workflow_id": 1
+     },
+     {
+       "id": 9,
+       "condition": "status == OPEN",
+       "parent_node_id": 8,
+       "parent_message_node_id": 3,
+       "workflow_id": 1
+     }
+   ]
+ },
+  {
+   "condition_edges":
+    [
+      {
+       "id": 1,
+       "condition_node_id": 8,
+       "edge": "YES"
+     },
+      {
+       "id": 2,
+       "condition_node_id": 8,
+       "edge": "NO"
+     },
+      {
+       "id": 3,
+       "condition_node_id": 9,
+       "edge": "YES"
+     },
+      {
+       "id": 4,
+       "condition_node_id": 9,
+       "edge": "NO"
+     }
+    ]
+  },
+ {
+   "message_nodes": [
+     {
+       "id": 4,
+       "status": "SENT",
+       "text": "Sent status message node",
+       "parent_node_id": 1,
+       "parent_condition_edge_id": null,
+       "workflow_id": 2
+     },
+     {
+       "id": 5,
+       "status": "PENDING",
+       "text": "Open: yes",
+       "parent_node_id": 9,
+       "parent_condition_edge_id": 3,
+       "workflow_id": 1
+     },
+     {
+       "id": 6,
+       "status": "PENDING",
+       "text": "Open: no",
+       "parent_node_id": 9,
+       "parent_condition_edge_id": 4,
+       "workflow_id": 1
+     },
+     {
+       "id": 7,
+       "status": "PENDING",
+       "text": "Sent: yes",
+       "parent_node_id": 8,
+       "parent_condition_edge_id": 1,
+       "workflow_id": 1
+     }
+   ]
+ },
+
+ {
+   "end_nodes":
+    [
+      {
+       "id": 10,
+       "message": "End, if sent: yes",
+       "parent_node_id": 7,
+       "workflow_id": 1
+     },
+     {
+       "id": 11,
+       "message": "End, if open: yes",
+       "parent_node_id": 5,
+       "workflow_id": 1
+     },
+        {
+       "id": 12,
+       "message": "End, if open: no",
+       "parent_node_id": 6,
+       "workflow_id": 1
+     }
+    ]
+ }
+
+
+]
