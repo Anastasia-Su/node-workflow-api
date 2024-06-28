@@ -38,7 +38,7 @@ alembic revision --autogenerate -m "initial_migration"
 Then open alembic.ini and set `sqlalchemy.url` to your db url.
 Open env.py in `alembic` folder. Add there these lines, if not present:
 ```shell
-from database import Base
+from db import Base
 from nodes.models import *
 target_metadata = Base.metadata
 ```
@@ -72,14 +72,14 @@ docker-compose up
 ## Instructions for API
 Here is an example algorithm for building a workflow:  
 
-![Diagram](images/short_diagram.drawio.png)  
+![Diagram](src/images/short_diagram.drawio.png)  
 
 Workflow starts. We receive an incoming message with a status.  
 Status is checked using conditions.  
 Then we receive a response message depending on the incoming message status.  
 For example, if the incoming message status is `pending`, we'll get the following graph:  
 
-![Diagram](images/workflow_graph_pending.png)  
+![Diagram](src/images/workflow_graph_pending.png)  
 
 ### Create workflow
 
@@ -114,14 +114,14 @@ You can delete it or substitute with your logic, if you want. To do it, follow c
 
 Here is an example algorithm for building a longer workflow: 
 
-![Diagram](images/long_diagram.drawio.png)  
+![Diagram](src/images/long_diagram.drawio.png)  
   
 Workflow construction process is almost the same.  
 When you add incoming message node for the second round, you may indicate id for any parent response message node.  
 Respective id will be placed automatically depending on you current workflow result.  
 The resulting graph, when the first incoming message is `open` and the second one is `sent`, will be the following:  
   
-![Diagram](images/workflow_graph_long_open_sent.png)  
+![Diagram](src/images/workflow_graph_long_open_sent.png)  
 
 ## Instructions for running tests
 

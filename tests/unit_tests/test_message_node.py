@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from sqlalchemy.orm import Session
-from nodes.crud import crud_message
+from src.nodes.crud import crud_message
 from nodes.models import MessageNode, MessageStatuses
 from nodes.schemas import MessageNodeCreate
 

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from nodes.routers import (
+from src.nodes.routers import (
     routers_message,
     routers_workflow,
     routers_condition,

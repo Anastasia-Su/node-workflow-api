@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 from fastapi import HTTPException, status
 
-from dependencies import CommonDB
+from database.dependencies import CommonDB
 from nodes.models import (
     Workflow,
     StartNode,
@@ -11,10 +11,10 @@ from nodes.models import (
     EndNode,
 )
 
-from utils.building_blocks.helpers_for_building_blocks import (
+from src.utils.building_blocks.helpers_for_building_blocks import (
     exception_no_next_node,
 )
-from utils.execute_workflow_main import execute_workflow
+from src.utils.execute_workflow_main import execute_workflow
 
 
 @pytest.fixture

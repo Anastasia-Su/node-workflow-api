@@ -6,15 +6,15 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import database_exists, create_database
 
-from load_mock_data import insert_mock_data, truncate_tables
+from database.load_mock_data import insert_mock_data, truncate_tables
 from nodes import models
 
-from dependencies import get_db
+from database.dependencies import get_db
 from main import app
 
 
 def setup_db(engine, db):
-    print("Setting up the database...")
+    print("Setting up the db...")
     models.Base.metadata.create_all(bind=engine)
     current_dir = os.path.dirname(__file__)
     file_path = os.path.join(current_dir, "mock_db_for_tests_.json")
