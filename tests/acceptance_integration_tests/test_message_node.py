@@ -1,5 +1,5 @@
 from fastapi import status
-from nodes.models import MessageStatuses
+from nodes.models import MessageStatuses, MessageNode
 from tests.setup_test_db import client, test_db
 
 
@@ -192,17 +192,36 @@ def test_create_or_update_with_null_parent_allowed(client):
     )
     assert response_update.status_code == status.HTTP_200_OK
 
+    assert response_create.json()["status"] == new_node_data["status"]
+    assert response_create.json()["text"] == new_node_data["text"]
+    assert (
+        response_create.json()["workflow_id"] == new_node_data["workflow_id"]
+    )
+
+    assert response_update.json()["status"] == new_node_data["status"]
+    assert response_update.json()["text"] == new_node_data["text"]
+    assert (
+        response_update.json()["workflow_id"] == new_node_data["workflow_id"]
+    )
+
 
 def test_read_message_nodes_allowed(client):
     """You should be able to retrieve list of all message_nodes"""
 
     response = client.get("/message_nodes/")
-
     assert response.status_code == status.HTTP_200_OK
+
+    response = client.get("/message_nodes/?text=open")
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.json()) == 4
+
+    response = client.get("/message_nodes/?text=sent&status=pending")
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.json()) == 3
 
 
 def test_read_single_node_allowed(client):
-    """You should be able retrieve a single message_node"""
+    """You should be able to retrieve a single message_node"""
 
     node_id = 3
     response = client.get(f"/message_nodes/{node_id}/")
@@ -217,3 +236,6 @@ def test_delete_node_allowed(client):
 
     response = client.delete(f"/message_nodes/{node_id}")
     assert response.status_code == status.HTTP_200_OK
+
+    response_after_delete = client.get(f"/message_nodes/{node_id}/")
+    assert response_after_delete.status_code == status.HTTP_404_NOT_FOUND

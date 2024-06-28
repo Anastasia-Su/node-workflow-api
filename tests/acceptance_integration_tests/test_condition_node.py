@@ -215,12 +215,28 @@ def test_create_or_update_with_null_parent_allowed(client):
     )
     assert response_update.status_code == status.HTTP_200_OK
 
+    assert response_create.json()["condition"] == new_node_data["condition"]
+    assert (
+        response_create.json()["workflow_id"] == new_node_data["workflow_id"]
+    )
+
+    assert response_update.json()["condition"] == new_node_data["condition"]
+    assert (
+        response_update.json()["workflow_id"] == new_node_data["workflow_id"]
+    )
+
 
 def test_read_nodes_allowed(client):
     """You should be able to get all condition nodes"""
-    response = client.get("/condition_nodes/")
 
+    response = client.get("/condition_nodes/")
     assert response.status_code == status.HTTP_200_OK
+
+    response = client.get(
+        "/condition_nodes/?condition=sent&parent_message_node_id=3"
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.json()) == 1
 
 
 def test_read_single_node_allowed(client):

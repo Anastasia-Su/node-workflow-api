@@ -154,6 +154,10 @@ def test_create_or_update_with_null_parent_allowed(client):
     response_update = client.put(f"/end_nodes/{node_id}", json=new_node_data)
     assert response_update.status_code == status.HTTP_200_OK
 
+    assert response_create.json()["message"] == new_node_data["message"]
+
+    assert response_update.json()["message"] == new_node_data["message"]
+
 
 def test_read_nodes_allowed(client):
     """You should be able to get all end nodes"""
