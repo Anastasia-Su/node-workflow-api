@@ -16,7 +16,7 @@ if not database_url:
 config.set("alembic", "sqlalchemy.url", database_url)
 
 
-with open("../alembic.ini", "w") as configfile:
+with open("alembic.ini", "w") as configfile:
     config.write(configfile)
 
 print("alembic.ini file has been updated with the DATABASE_URL")
