@@ -35,13 +35,23 @@ alembic init alembic
 alembic revision --autogenerate -m "initial_migration"
 ```
 
-Then open alembic.ini and set `sqlalchemy.url` to your db url.
 Open env.py in `alembic` folder. Add there these lines, if not present:
 ```shell
 from db import Base
 from nodes.models import *
 target_metadata = Base.metadata
+
+load_dotenv()
+
+SQLALCHEMY_DATABASE_URL = os.environ["MARIADB_DATABASE_URL"]
+config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL)
 ```
+
+Or you can set `sqlalchemy.url` manually:
+```shell
+Open alembic.ini and set `sqlalchemy.url` to your db url.
+```
+
 Then type in your terminal:
 ```shell
 alembic upgrade head
@@ -103,8 +113,8 @@ Choose if you want to draw graph, using dropdown menu.
 2. In `utils/graph.py`, you can set up graph options by following the comments there:  
 you can choose different layout or choose to save a graph to your files.
 3. If you would like to test workflow execution without creating it, you can load mock data.  
-Type in the terminal: `load_mock_data.py mock_db.json` to test the above algorithm.  
-Or type: `load_mock_data.py mock_db_long.json` to test the algorithm, shown below.  
+Type in the terminal: `python database/load_mock_data.py database/mock_db.json` to test the above algorithm.  
+Or type: `python database/load_mock_data.py database/mock_db_long.json` to test the algorithm, shown below.  
 If you prefer using SQLite, change URL to SQLITE_DATABASE_URL in `load_mock_data.py`.
 4. You may notice that each time workflow runs, you get different incoming messages.  
 This behavior is the result of using `random.choice`. It is intended to simulate status change in a network.  

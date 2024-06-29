@@ -5,7 +5,7 @@ import sys
 from dotenv import load_dotenv
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
-from database.database_setup import SessionLocal, engine
+from database_setup import SessionLocal, engine
 
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
