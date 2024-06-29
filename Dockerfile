@@ -15,8 +15,6 @@ RUN apt-get update  \
 
 COPY . .
 
-ENV PYTHONPATH=/app
-
 RUN mkdir -p /vol/web/media && \
     chmod -R 755 /vol/web/
 
