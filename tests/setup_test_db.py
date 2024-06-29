@@ -16,7 +16,6 @@ from main import app
 def setup_db(engine, db):
     print("Setting up the db...")
     models.Base.metadata.create_all(bind=engine)
-    print(f"Tables created: {engine.table_names()}")
     current_dir = os.path.dirname(__file__)
     file_path = os.path.join(current_dir, "mock_db_for_tests_.json")
     insert_mock_data(db, file_path)
