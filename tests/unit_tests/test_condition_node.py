@@ -2,9 +2,9 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from sqlalchemy.orm import Session
-from nodes.crud import crud_condition
-from nodes.models import ConditionNode
-from nodes.schemas import ConditionNodeCreate
+from src.nodes.crud import crud_condition
+from src.nodes.models import ConditionNode
+from src.nodes.schemas import ConditionNodeCreate
 
 
 class TestCreateNode(TestCase):
@@ -33,7 +33,7 @@ class TestCreateNode(TestCase):
         self.assertEqual(result.condition, node_data.condition)
         self.assertEqual(result.workflow_id, node_data.workflow_id)
 
-    @patch("nodes.models.ConditionNode")
+    @patch("src.nodes.models.ConditionNode")
     def test_get_condition_node_detail_success(self, MockConditionNode):
         mock_node = MagicMock(spec=ConditionNode)
         self.mock_session.get.return_value = mock_node
@@ -48,7 +48,7 @@ class TestCreateNode(TestCase):
         )
         self.assertEqual(result, mock_node)
 
-    @patch("nodes.models.ConditionNode")
+    @patch("src.nodes.models.ConditionNode")
     def test_get_condition_node_detail_not_found(self, MockConditionNode):
         self.mock_session.get.return_value = None
 
@@ -62,7 +62,7 @@ class TestCreateNode(TestCase):
         )
         self.assertIsNone(result)
 
-    @patch("nodes.models.ConditionNode")
+    @patch("src.nodes.models.ConditionNode")
     def test_update_condition_node(self, MockConditionNode):
         mock_node = MagicMock(spec=ConditionNode)
         self.mock_session.get.return_value = mock_node
@@ -88,7 +88,7 @@ class TestCreateNode(TestCase):
         self.assertEqual(result.condition, new_node_data.condition)
         self.assertEqual(result.workflow_id, new_node_data.workflow_id)
 
-    @patch("nodes.models.ConditionNode")
+    @patch("src.nodes.models.ConditionNode")
     def test_delete_condition_node(self, MockConditionNode):
         mock_node = MagicMock(spec=ConditionNode)
         self.mock_session.get.return_value = mock_node

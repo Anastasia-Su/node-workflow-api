@@ -3,8 +3,8 @@ from unittest.mock import MagicMock, patch
 
 from sqlalchemy.orm import Session
 from src.nodes.crud import crud_message
-from nodes.models import MessageNode, MessageStatuses
-from nodes.schemas import MessageNodeCreate
+from src.nodes.models import MessageNode, MessageStatuses
+from src.nodes.schemas import MessageNodeCreate
 
 
 class TestCreateNode(TestCase):
@@ -35,7 +35,7 @@ class TestCreateNode(TestCase):
         self.assertEqual(result.text, node_data.text)
         self.assertEqual(result.workflow_id, node_data.workflow_id)
 
-    @patch("nodes.models.MessageNode")
+    @patch("src.nodes.models.MessageNode")
     def test_get_message_node_detail_success(self, MockMessageNode):
         mock_node = MagicMock(spec=MessageNode)
         self.mock_session.get.return_value = mock_node
@@ -48,7 +48,7 @@ class TestCreateNode(TestCase):
         self.mock_session.get.assert_called_once_with(MockMessageNode, node_id)
         self.assertEqual(result, mock_node)
 
-    @patch("nodes.models.MessageNode")
+    @patch("src.nodes.models.MessageNode")
     def test_get_message_node_detail_not_found(self, MockMessageNode):
         self.mock_session.get.return_value = None
 
@@ -60,7 +60,7 @@ class TestCreateNode(TestCase):
         self.mock_session.get.assert_called_once_with(MockMessageNode, node_id)
         self.assertIsNone(result)
 
-    @patch("nodes.models.MessageNode")
+    @patch("src.nodes.models.MessageNode")
     def test_update_message_node(self, MockMessageNode):
         mock_node = MagicMock(spec=MessageNode)
         self.mock_session.get.return_value = mock_node
@@ -86,7 +86,7 @@ class TestCreateNode(TestCase):
         self.assertEqual(result.text, new_node_data.text)
         self.assertEqual(result.workflow_id, new_node_data.workflow_id)
 
-    @patch("nodes.models.MessageNode")
+    @patch("src.nodes.models.MessageNode")
     def test_delete_message_node(self, MockMessageNode):
         mock_node = MagicMock(spec=MessageNode)
         self.mock_session.get.return_value = mock_node

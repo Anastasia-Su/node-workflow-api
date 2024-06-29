@@ -6,7 +6,7 @@ services:
         ports:
             - "8000:8000"
         volumes:
-            - ./:/app/
+            - .:/app/
         command: ["sh", "-c", "./wait_for_it.sh db:3306 -- ./start.sh"]
 
         env_file:
@@ -26,6 +26,7 @@ services:
             - MARIADB_USER=${MARIADB_USER}
             - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
             - MYSQL_HOST=db
+
         volumes:
             - db_data:/var/lib/mysql
 

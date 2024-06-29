@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import database_exists, create_database
 
 from database.load_mock_data import insert_mock_data, truncate_tables
-from nodes import models
+from src.nodes import models
 
 from database.dependencies import get_db
 from main import app
@@ -16,6 +16,7 @@ from main import app
 def setup_db(engine, db):
     print("Setting up the db...")
     models.Base.metadata.create_all(bind=engine)
+    print(f"Tables created: {engine.table_names()}")
     current_dir = os.path.dirname(__file__)
     file_path = os.path.join(current_dir, "mock_db_for_tests_.json")
     insert_mock_data(db, file_path)
@@ -24,7 +25,7 @@ def setup_db(engine, db):
 
 @pytest.fixture(scope="module")
 def test_db():
-    # SQLALCHEMY_DATABASE_URL = f"{os.environ.get('SQLITE_DATABASE_URL')}"
+    # SQLALCHEMY_DATABASE_URL = "sqlite:///./testing.db"
     SQLALCHEMY_DATABASE_URL = f"{os.environ.get('MARIADB_TESTING_URL')}"
 
     engine = create_engine(SQLALCHEMY_DATABASE_URL)

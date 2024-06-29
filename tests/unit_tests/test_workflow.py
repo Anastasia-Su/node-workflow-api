@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 from fastapi import HTTPException, status
 
 from database.dependencies import CommonDB
-from nodes.models import (
+from src.nodes.models import (
     Workflow,
     StartNode,
     MessageNode,
@@ -75,13 +75,13 @@ def test_execute_workflow(
     mock_end_node,
 ):
     with patch(
-        "nodes.crud.crud_workflow.get_workflow_detail",
+        "src.nodes.crud.crud_workflow.get_workflow_detail",
         return_value=mock_workflow,
     ), patch(
-        "nodes.crud.crud_condition_edge.get_condition_edge_list",
+        "src.nodes.crud.crud_condition_edge.get_condition_edge_list",
         return_value=[],
     ), patch(
-        "utils.building_blocks.helpers_for_building_blocks.get_node_lists",
+        "src.utils.building_blocks.helpers_for_building_blocks.get_node_lists",
         return_value=(
             mock_start_node,
             [mock_message_node],
@@ -89,16 +89,16 @@ def test_execute_workflow(
             [mock_end_node],
         ),
     ), patch(
-        "utils.building_blocks.handle_start_node",
+        "src.utils.building_blocks.handle_start_node",
         return_value=mock_message_node,
     ), patch(
-        "utils.building_blocks.handle_message_node",
+        "src.utils.building_blocks.handle_message_node",
         side_effect=[mock_condition_node, mock_message_node, mock_end_node],
     ), patch(
-        "utils.building_blocks.handle_condition_node",
+        "src.utils.building_blocks.handle_condition_node",
         side_effect=[mock_condition_node, mock_message_node],
     ), patch(
-        "utils.building_blocks.handle_end_node",
+        "src.utils.building_blocks.handle_end_node",
         return_value=None,
     ):
 
@@ -112,13 +112,13 @@ def test_execute_workflow(
 
 def test_workflow_with_missing_nodes(mock_db, mock_workflow, mock_start_node):
     with patch(
-        "nodes.crud.crud_workflow.get_workflow_detail",
+        "src.nodes.crud.crud_workflow.get_workflow_detail",
         return_value=mock_workflow,
     ), patch(
-        "nodes.crud.crud_condition_edge.get_condition_edge_list",
+        "src.nodes.crud.crud_condition_edge.get_condition_edge_list",
         return_value=[],
     ), patch(
-        "utils.building_blocks.helpers_for_building_blocks.get_node_lists",
+        "src.utils.building_blocks.helpers_for_building_blocks.get_node_lists",
         return_value=(
             mock_start_node,
             [],
@@ -126,7 +126,7 @@ def test_workflow_with_missing_nodes(mock_db, mock_workflow, mock_start_node):
             [],
         ),
     ), patch(
-        "utils.building_blocks.handle_start_node",
+        "src.utils.building_blocks.handle_start_node",
         side_effect=exception_no_next_node,
     ):
         with pytest.raises(HTTPException) as e:

@@ -2,9 +2,10 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from sqlalchemy.orm import Session
-from nodes.crud import crud_start
-from nodes.models import StartNode
-from nodes.schemas import StartNodeCreate
+
+from src.nodes.models import StartNode
+from src.nodes.schemas import StartNodeCreate
+from src.nodes.crud import crud_start
 
 
 class TestCreateNode(TestCase):
@@ -31,7 +32,7 @@ class TestCreateNode(TestCase):
         self.assertEqual(result.message, node_data.message)
         self.assertEqual(result.workflow_id, node_data.workflow_id)
 
-    @patch("nodes.models.StartNode")
+    @patch("src.nodes.models.StartNode")
     def test_get_start_node_detail_success(self, MockStartNode):
         mock_node = MagicMock(spec=StartNode)
         self.mock_session.get.return_value = mock_node
@@ -44,7 +45,7 @@ class TestCreateNode(TestCase):
         self.mock_session.get.assert_called_once_with(MockStartNode, node_id)
         self.assertEqual(result, mock_node)
 
-    @patch("nodes.models.StartNode")
+    @patch("src.nodes.models.StartNode")
     def test_get_start_node_detail_not_found(self, MockStartNode):
         self.mock_session.get.return_value = None
 
@@ -56,7 +57,7 @@ class TestCreateNode(TestCase):
         self.mock_session.get.assert_called_once_with(MockStartNode, node_id)
         self.assertIsNone(result)
 
-    @patch("nodes.models.StartNode")
+    @patch("src.nodes.models.StartNode")
     def test_update_start_node(self, MockStartNode):
         mock_node = MagicMock(spec=StartNode)
         self.mock_session.get.return_value = mock_node
@@ -78,7 +79,7 @@ class TestCreateNode(TestCase):
         self.assertEqual(result.message, new_node_data.message)
         self.assertEqual(result.workflow_id, new_node_data.workflow_id)
 
-    @patch("nodes.models.StartNode")
+    @patch("src.nodes.models.StartNode")
     def test_delete_start_node(self, MockStartNode):
         mock_node = MagicMock(spec=StartNode)
         self.mock_session.get.return_value = mock_node

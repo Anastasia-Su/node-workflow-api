@@ -1,5 +1,5 @@
 from fastapi import status
-from nodes.models import MessageStatuses, MessageNode
+from src.nodes.models import MessageStatuses
 from tests.setup_test_db import client, test_db
 
 
