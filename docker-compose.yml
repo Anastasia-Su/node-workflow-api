@@ -2,16 +2,15 @@ version: "3"
 services:
     app:
         build:
-            context: ..
-            dockerfile: docker/Dockerfile
+            context: .
         ports:
             - "8000:8000"
         volumes:
-            - ..:/app/
-        command: ["sh", "-c", "docker/wait_for_it.sh db:3306 -- docker/start.sh"]
+            - ./:/app/
+        command: ["sh", "-c", "./wait_for_it.sh db:3306 -- ./start.sh"]
 
         env_file:
-            - ../.env
+            - .env
         depends_on:
             - db
 
@@ -20,7 +19,7 @@ services:
         ports:
             - "3307:3306"
         env_file:
-            - ../.env
+            - .env
 
         environment:
             - MARIADB_DATABASE=${MARIADB_DATABASE}

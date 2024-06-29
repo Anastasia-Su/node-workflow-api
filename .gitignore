@@ -294,5 +294,6 @@ alembic.ini
 *.ini
 
 docker/alembic
+docker/
 
 # End of https://www.toptal.com/developers/gitignore/api/pycharm,python

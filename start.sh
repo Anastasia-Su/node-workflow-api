@@ -5,6 +5,6 @@ if [ ! -d "alembic" ]; then
     alembic revision --autogenerate -m "initial_migration"
 fi
 
-python docker/generate_alembic_ini.py
+python generate_alembic_ini.py
 alembic upgrade head
 python -m uvicorn main:app --host 0.0.0.0 --port 8000
