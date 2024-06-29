@@ -1,5 +1,7 @@
 venv/
 .venv/
+../.venv/
+**/.venv/
 .env
-alembic.ini
-alembic/
+../.env
+**/.env
