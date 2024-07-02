@@ -37,7 +37,7 @@ alembic revision --autogenerate -m "initial_migration"
 
 Open env.py in `alembic` folder. Add there these lines, if not present:
 ```shell
-from db import Base
+from database.database_setup import Base
 from nodes.models import *
 target_metadata = Base.metadata
 
@@ -63,6 +63,7 @@ python -m uvicorn main:app
 Install Docker and run these commands:
 
 ```shell
+cd docker
 docker-compose build
 docker-compose up
 ```

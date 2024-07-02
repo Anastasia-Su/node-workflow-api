@@ -3,7 +3,7 @@ LABEL maintainer="anastasia.su.po@gmail.com"
 ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
-COPY requirements.txt requirements.txt
+COPY ../requirements.txt requirements.txt
 
 
 RUN pip install --no-cache-dir -r requirements.txt
@@ -13,9 +13,9 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 
 
-COPY . .
+COPY .. .
 
 RUN mkdir -p /vol/web/media && \
     chmod -R 755 /vol/web/
 
-CMD ["sh", "-c", "./wait_for_it.sh db:3306 -- ./start.sh"]
+CMD ["sh", "-c", "docker/wait_for_it.sh db:3306 -- docker/start.sh"]
